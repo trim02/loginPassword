@@ -27,16 +27,13 @@ public class PlayerConnection {
 
     }
 
-    public static boolean isPlayerInGroup(Player player, String group) {
-        return player.hasPermission("group." + group);
-    }
 
     // Check if the player bypasses login requirement
     @Subscribe
     public void onPlayerJoin(PlayerChooseInitialServerEvent event) {
         Player player = event.getPlayer();
 
-        if ((configVar.oneTimeLogin) && ((configVar.bypassMethod.equals("group") && isPlayerInGroup(player, configVar.bypassGroup)) || ((configVar.bypassMethod.equals("user") && player.hasPermission(configVar.bypassNode))))) {
+        if ((configVar.oneTimeLogin) && ((configVar.bypassMethod.equals("group") && player.hasPermission(configVar.bypassGroup)) || ((configVar.bypassMethod.equals("user") && player.hasPermission(configVar.bypassNode))))) {
             return;
 //            System.out.println("Player is in group");
 ////            player.transferToHost(new InetSocketAddress("localhost",25566));
