@@ -64,14 +64,14 @@ public class LoginCommand implements SimpleCommand {
     public boolean hasPermission(final Invocation invocation) {
         boolean sourcePermissionNode = invocation.source().hasPermission(configVar.bypassNode);
         boolean sourcePermissionGroup = invocation.source().hasPermission("group." + configVar.bypassGroup);
-        System.out.println("User has group: " + invocation.source().hasPermission("group." + configVar.bypassGroup));
-        System.out.println("User has node: " + invocation.source().hasPermission(configVar.bypassNode));
-        System.out.println("Bypass method: " + configVar.bypassMethod);
-        System.out.println("One Time Login: " + configVar.oneTimeLogin);
-        System.out.println("disable command: " + configVar.disableLoginCommandOnBypass);
+//        System.out.println("User has group: " + invocation.source().hasPermission("group." + configVar.bypassGroup));
+//        System.out.println("User has node: " + invocation.source().hasPermission(configVar.bypassNode));
+//        System.out.println("Bypass method: " + configVar.bypassMethod);
+//        System.out.println("One Time Login: " + configVar.oneTimeLogin);
+//        System.out.println("disable command: " + configVar.disableLoginCommandOnBypass);
         if (configVar.loginCommandNegated) {
             if ((configVar.oneTimeLogin && configVar.disableLoginCommandOnBypass) && ((configVar.bypassMethod.equals("group") && sourcePermissionGroup) || (configVar.bypassMethod.equals("user") && sourcePermissionNode))) {
-                System.out.println("This command should be disabled");
+//                System.out.println("This command should be disabled");
                 return false;
             } else {
                 return true;
