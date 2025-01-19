@@ -7,6 +7,7 @@ import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyReloadEvent;
+import com.velocitypowered.api.plugin.Dependency;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
@@ -20,7 +21,14 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-@Plugin(id = "loginauth", name = "loginAuth", version = BuildConstants.VERSION, authors = {"trim02"})
+@Plugin(id = "loginauth",
+        name = "loginAuth",
+        version = BuildConstants.VERSION,
+        authors = {"trim02"},
+        dependencies = {
+        @Dependency(id = "luckperms")
+        }
+)
 public class LoginAuth {
     
     
@@ -102,7 +110,7 @@ public class LoginAuth {
         server.getEventManager().register(this, new PlayerConnection(server, this));
         CommandManager commandManager = server.getCommandManager();
         CommandMeta commandMeta = commandManager.metaBuilder("login").plugin(this).build();
-        SimpleCommand loginCommand = new LoginCommand(server);
+        SimpleCommand loginCommand = new LoginCommand(server, server.getPluginManager(), logger);
         commandManager.register(commandMeta,loginCommand);
 
     }
