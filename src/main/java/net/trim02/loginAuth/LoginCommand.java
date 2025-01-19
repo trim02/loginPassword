@@ -2,6 +2,7 @@ package net.trim02.loginAuth;
 
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
+import com.velocitypowered.api.plugin.PluginManager;
 import com.velocitypowered.api.proxy.ConsoleCommandSource;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
@@ -12,16 +13,25 @@ import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.node.Node;
 import net.trim02.loginAuth.LoginAuth.configVar;
+import org.slf4j.Logger;
 
 import java.util.Optional;
 
 public class LoginCommand implements SimpleCommand {
     private final ProxyServer server;
-    LuckPerms lpApi = LuckPermsProvider.get();
+    public static LuckPerms lpApi;
+//    public static boolean luckPermsIsPresent;
 
-    public LoginCommand(ProxyServer server) {
+    public LoginCommand(ProxyServer server, PluginManager pluginManager, Logger logger) {
         this.server = server;
+//        if(pluginManager.getPlugin("LuckPerms").isPresent()) {
+//            lpApi = LuckPermsProvider.get();
+//            luckPermsIsPresent = true;
+//        }
     }
+//    public static boolean luckPermsPresent(){
+//        return luckPermsIsPresent;
+//    }
 
     @Override
     public void execute(Invocation invocation) {
