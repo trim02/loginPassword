@@ -19,7 +19,7 @@ import java.util.Optional;
 
 public class LoginCommand implements SimpleCommand {
     private final ProxyServer server;
-    public static LuckPerms lpApi;
+    public static LuckPerms lpApi = LuckPermsProvider.get();
 //    public static boolean luckPermsIsPresent;
 
     public LoginCommand(ProxyServer server, PluginManager pluginManager, Logger logger) {
