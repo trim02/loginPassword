@@ -43,18 +43,17 @@ public class LoginCommand implements SimpleCommand {
             source.sendMessage(Component.text(configVar.noPassword, NamedTextColor.RED));
             return;
         }
-//        source.sendMessage(Component.text("Hello World from a command!", NamedTextColor.AQUA));
         if (source instanceof Player player && args[0].equals(configVar.serverPassword)) {
             Optional<RegisteredServer> connectToServer = server.getServer(configVar.hubServer);
             player.createConnectionRequest(connectToServer.get()).connectWithIndication();
 
             if (!player.hasPermission("group." + configVar.bypassGroup) && (configVar.oneTimeLogin && configVar.pluginGrantsBypass) && configVar.bypassMethod.equals("group")) {
-//                System.out.println("---- Adding group ----");
+
                 lpApi.getUserManager().modifyUser(player.getUniqueId(), user -> {
                     user.data().add(Node.builder("group." + configVar.bypassGroup).build());
                 });
             } else if (!player.hasPermission(configVar.bypassNode) && (configVar.oneTimeLogin && configVar.pluginGrantsBypass) && configVar.bypassMethod.equals("user")) {
-//                System.out.println("---- Adding node ----");
+
                 lpApi.getUserManager().modifyUser(player.getUniqueId(), user -> {
                     user.data().add(Node.builder(configVar.bypassNode).build());
                 });
@@ -74,14 +73,9 @@ public class LoginCommand implements SimpleCommand {
     public boolean hasPermission(final Invocation invocation) {
         boolean sourcePermissionNode = invocation.source().hasPermission(configVar.bypassNode);
         boolean sourcePermissionGroup = invocation.source().hasPermission("group." + configVar.bypassGroup);
-//        System.out.println("User has group: " + invocation.source().hasPermission("group." + configVar.bypassGroup));
-//        System.out.println("User has node: " + invocation.source().hasPermission(configVar.bypassNode));
-//        System.out.println("Bypass method: " + configVar.bypassMethod);
-//        System.out.println("One Time Login: " + configVar.oneTimeLogin);
-//        System.out.println("disable command: " + configVar.disableLoginCommandOnBypass);
         if (configVar.loginCommandNegated) {
             if ((configVar.oneTimeLogin && configVar.disableLoginCommandOnBypass) && ((configVar.bypassMethod.equals("group") && sourcePermissionGroup) || (configVar.bypassMethod.equals("user") && sourcePermissionNode))) {
-//                System.out.println("This command should be disabled");
+
                 return false;
             } else {
                 return true;
@@ -90,7 +84,6 @@ public class LoginCommand implements SimpleCommand {
         } else {
             return invocation.source().hasPermission("loginpassword.login");
         }
-//        return (configVar.oneTimeLogin && configVar.disableLoginCommandOnBypass) && !(configVar.bypassMethod.equals("group") && sourcePermissionGroup) || !(configVar.bypassMethod.equals("user") && sourcePermissionNode);
 
 
     }
