@@ -16,7 +16,7 @@ bypassMethod: "group"
 # the group to check the player has if bypassMethod is set to group
 bypassGroup: "loginbypass"
 # the permission node to check if a player has set if bypassMethod is set to user
-bypassNode: "loginauth.bypass"
+bypassNode: "loginpassword.bypass"
 # if set to true, the plugin will set either the bypassGroup or the bypassNode when a user logins in
 pluginGrantsBypass: true
 # Set to false to allow the login command to be used by players with bypass permission

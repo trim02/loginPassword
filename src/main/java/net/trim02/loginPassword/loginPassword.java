@@ -1,4 +1,4 @@
-package net.trim02.loginAuth;
+package net.trim02.loginPassword;
 
 import com.google.inject.Inject;
 import com.velocitypowered.api.command.CommandManager;
@@ -21,15 +21,15 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-@Plugin(id = "loginauth",
-        name = "loginAuth",
+@Plugin(id = "loginpassword",
+        name = "loginPassword",
         version = BuildConstants.VERSION,
         authors = {"trim02"},
         dependencies = {
         @Dependency(id = "luckperms")
         }
 )
-public class LoginAuth {
+public class loginPassword {
     
     
 
@@ -38,7 +38,7 @@ public class LoginAuth {
     private final Path dataDirectory;
 
     @Inject
-    public LoginAuth(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
+    public loginPassword(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
         this.server = server;
         this.logger = logger;
         this.dataDirectory = dataDirectory;

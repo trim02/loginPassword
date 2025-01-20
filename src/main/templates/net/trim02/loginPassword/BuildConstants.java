@@ -1,4 +1,4 @@
-package net.trim02.loginAuth;
+package net.trim02.loginPassword;
 
 // The constants are replaced before compilation
 public class BuildConstants {

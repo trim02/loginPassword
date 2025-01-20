@@ -1,4 +1,4 @@
-package net.trim02.loginAuth;
+package net.trim02.loginPassword;
 
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent;
@@ -8,7 +8,7 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.scheduler.ScheduledTask;
 import net.kyori.adventure.text.Component;
-import net.trim02.loginAuth.LoginAuth.configVar;
+import net.trim02.loginPassword.loginPassword.configVar;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -18,10 +18,10 @@ import java.util.concurrent.TimeUnit;
 
 public class PlayerConnection {
     private final ProxyServer server;
-    private final LoginAuth plugin;
+    private final loginPassword plugin;
     static HashMap<Integer, String> hashScheduledPlayerTask = new HashMap<>();
 
-    public PlayerConnection(ProxyServer server, LoginAuth plugin) {
+    public PlayerConnection(ProxyServer server, loginPassword plugin) {
         this.server = server;
         this.plugin = plugin;
 

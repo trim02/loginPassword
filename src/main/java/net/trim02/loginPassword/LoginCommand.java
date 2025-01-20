@@ -1,4 +1,4 @@
-package net.trim02.loginAuth;
+package net.trim02.loginPassword;
 
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
@@ -12,7 +12,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.node.Node;
-import net.trim02.loginAuth.LoginAuth.configVar;
+import net.trim02.loginPassword.loginPassword.configVar;
 import org.slf4j.Logger;
 
 import java.util.Optional;
@@ -88,7 +88,7 @@ public class LoginCommand implements SimpleCommand {
             }
 
         } else {
-            return invocation.source().hasPermission("loginauth.login");
+            return invocation.source().hasPermission("loginpassword.login");
         }
 //        return (configVar.oneTimeLogin && configVar.disableLoginCommandOnBypass) && !(configVar.bypassMethod.equals("group") && sourcePermissionGroup) || !(configVar.bypassMethod.equals("user") && sourcePermissionNode);
 
