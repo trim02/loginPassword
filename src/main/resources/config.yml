@@ -31,7 +31,7 @@ kickTimeout: 30
 noPassword: "Please provide a password. It can be found on Discord"
 wrongPassword: "Wrong Password."
 
-# set to false to make the login command only accessible to players with the permission node loginauth.login.
+# set to false to make the login command only accessible to players with the permission node loginpassword.login.
 # this could be used to have a private server where only some players have access to. oneTimeLogin must be disabled otherwise players with the bypass permissions will always be sent to the private server.
 loginCommandNegated: "true"
 
