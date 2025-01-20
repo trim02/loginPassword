@@ -19,11 +19,15 @@ import java.util.Optional;
 
 public class LoginCommand implements SimpleCommand {
     private final ProxyServer server;
+    private final Logger logger;
+    private final PluginManager pluginManager;
     public static LuckPerms lpApi = LuckPermsProvider.get();
 //    public static boolean luckPermsIsPresent;
 
     public LoginCommand(ProxyServer server, PluginManager pluginManager, Logger logger) {
         this.server = server;
+        this.logger = logger;
+        this.pluginManager = pluginManager;
 //        if(pluginManager.getPlugin("LuckPerms").isPresent()) {
 //            lpApi = LuckPermsProvider.get();
 //            luckPermsIsPresent = true;
@@ -48,9 +52,19 @@ public class LoginCommand implements SimpleCommand {
             player.createConnectionRequest(connectToServer.get()).connectWithIndication();
 
             if (!player.hasPermission(configVar.bypassNode) && (configVar.oneTimeLogin && configVar.pluginGrantsBypass)) {
-                lpApi.getUserManager().modifyUser(player.getUniqueId(), user -> {
-                    user.data().add(Node.builder(configVar.bypassNode).build());
-                });
+                if (configVar.bypassMethod.equalsIgnoreCase("user")) {
+                    lpApi.getUserManager().modifyUser(player.getUniqueId(), user -> {
+                        user.data().add(Node.builder(configVar.bypassNode).build());
+                    });
+                } else if (configVar.bypassMethod.equalsIgnoreCase("group")) {
+                    lpApi.getUserManager().modifyUser(player.getUniqueId(), user -> {
+                        user.data().add(Node.builder("group." + configVar.bypassGroup).build());
+                    });
+                }
+            else {
+                    logger.error("An error occurred while granting the user {} bypass permission. This shouldn't happen. Bother trim", player.getUsername());
+               source.sendMessage(Component.text("An error occurred. Please inform server staff.", NamedTextColor.RED));
+            }
             }
 
         } else if (!args[0].equals(configVar.serverPassword)) {

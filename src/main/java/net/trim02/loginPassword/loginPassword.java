@@ -48,6 +48,8 @@ public class loginPassword {
         // public static String bypassGroup;
         public static String bypassNode;
         public static Boolean pluginGrantsBypass;
+        public static String bypassMethod;
+        public static String bypassGroup;
         public static Boolean disableLoginCommandOnBypass;
         public static String kickMessage;
         public static Long kickTimeout;
@@ -86,8 +88,8 @@ public class loginPassword {
         configVar.hubServer = node.node("hubServer").getString();
         configVar.serverPassword = node.node("serverPassword").getString();
         configVar.oneTimeLogin = node.node("oneTimeLogin").getBoolean();
-        // configVar.bypassMethod = node.node("bypassMethod").getString();
-        // configVar.bypassGroup = node.node("bypassGroup").getString();
+        configVar.bypassMethod = node.node("bypassMethod").getString();
+        configVar.bypassGroup = node.node("bypassGroup").getString();
         configVar.bypassNode = node.node("bypassNode").getString();
         configVar.pluginGrantsBypass = node.node("pluginGrantsBypass").getBoolean();
         configVar.disableLoginCommandOnBypass = node.node("disableLoginCommandOnBypass").getBoolean();
@@ -95,7 +97,7 @@ public class loginPassword {
         configVar.kickTimeout = node.node("kickTimeout").getLong();
         configVar.noPassword = node.node("noPassword").getString();
         configVar.wrongPassword = node.node("wrongPassword").getString();
-        configVar.loginCommandNegated = node.node("loginCommandNegated").getBoolean();
+        configVar.loginCommandNegated = node.node("loginCommandGrantedToEveryone").getBoolean();
         configVar.loginCommandNode = node.node("loginCommandNode").getString();
 
     }
