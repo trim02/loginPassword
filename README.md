@@ -51,7 +51,7 @@ The plugin uses a YAML configuration file (`config.yml`) to manage its settings.
 3. Start the server to generate the default configuration file.
 4. Edit the `config.yml` file in the `plugins/LoginPassword` directory to suit your needs.
 5. Configure `velocity.toml` by adding the login server to `[servers]` table. If you want `ping-passthrough = "all"` to work correctly, have only the hub server in the `try = []` array, do not add the login server to the array. The plugin will handle redirecting players to the login server.
-6. Restart the server or run `velocity reload` to reload the config.
+6. Restart the server or run `velocity reload` to reload all plugins.
 
 ## Usage
 
@@ -63,7 +63,7 @@ Open an issue or a pull request if you want.
 
 ## License
 
-This project is licensed under the GNU General Public License v3.0. See the `LICENSE` file for details.
+This project is licensed under the GNU Lesser General Public License v2.1. See the `LICENSE` file for details.
 
 ## Misc
 Logo borrowed from [twemoji](https://github.com/twitter/twemoji), CC-BY 4.0.
