@@ -21,17 +21,11 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-@Plugin(id = "loginpassword",
-        name = "loginPassword",
-        version = BuildConstants.VERSION,
-        authors = {"trim02"},
-        dependencies = {
-        @Dependency(id = "luckperms")
-        }
-)
+@Plugin(id = "loginpassword", name = "loginPassword", version = BuildConstants.VERSION, authors = {
+        "trim02" }, dependencies = {
+                @Dependency(id = "luckperms")
+        })
 public class loginPassword {
-    
-    
 
     private final ProxyServer server;
     private final Logger logger;
@@ -44,13 +38,14 @@ public class loginPassword {
         this.dataDirectory = dataDirectory;
 
     }
+
     public class configVar {
         public static String loginServer;
         public static String hubServer;
         public static String serverPassword;
         public static Boolean oneTimeLogin;
-        public static String bypassMethod;
-        public static String bypassGroup;
+        // public static String bypassMethod;
+        // public static String bypassGroup;
         public static String bypassNode;
         public static Boolean pluginGrantsBypass;
         public static Boolean disableLoginCommandOnBypass;
@@ -59,10 +54,12 @@ public class loginPassword {
         public static String noPassword;
         public static String wrongPassword;
         public static Boolean loginCommandNegated;
+        public static String loginCommandNode;
 
     }
+
     public void initConfig() {
-        if(Files.notExists(dataDirectory)){
+        if (Files.notExists(dataDirectory)) {
             try {
                 Files.createDirectory(dataDirectory);
             } catch (IOException e) {
@@ -70,9 +67,9 @@ public class loginPassword {
             }
         }
         final Path config = dataDirectory.resolve("config.yml");
-        if(Files.notExists(config)){
-            try(InputStream stream = this.getClass().getClassLoader().getResourceAsStream("config.yml")){
-                Files.copy(stream,config);
+        if (Files.notExists(config)) {
+            try (InputStream stream = this.getClass().getClassLoader().getResourceAsStream("config.yml")) {
+                Files.copy(stream, config);
 
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -89,8 +86,8 @@ public class loginPassword {
         configVar.hubServer = node.node("hubServer").getString();
         configVar.serverPassword = node.node("serverPassword").getString();
         configVar.oneTimeLogin = node.node("oneTimeLogin").getBoolean();
-        configVar.bypassMethod = node.node("bypassMethod").getString();
-        configVar.bypassGroup = node.node("bypassGroup").getString();
+        // configVar.bypassMethod = node.node("bypassMethod").getString();
+        // configVar.bypassGroup = node.node("bypassGroup").getString();
         configVar.bypassNode = node.node("bypassNode").getString();
         configVar.pluginGrantsBypass = node.node("pluginGrantsBypass").getBoolean();
         configVar.disableLoginCommandOnBypass = node.node("disableLoginCommandOnBypass").getBoolean();
@@ -99,6 +96,7 @@ public class loginPassword {
         configVar.noPassword = node.node("noPassword").getString();
         configVar.wrongPassword = node.node("wrongPassword").getString();
         configVar.loginCommandNegated = node.node("loginCommandNegated").getBoolean();
+        configVar.loginCommandNode = node.node("loginCommandNode").getString();
 
     }
 
@@ -111,11 +109,12 @@ public class loginPassword {
         CommandManager commandManager = server.getCommandManager();
         CommandMeta commandMeta = commandManager.metaBuilder("login").plugin(this).build();
         SimpleCommand loginCommand = new LoginCommand(server, server.getPluginManager(), logger);
-        commandManager.register(commandMeta,loginCommand);
+        commandManager.register(commandMeta, loginCommand);
 
     }
+
     @Subscribe
-    public void onProxyReload(ProxyReloadEvent event){
+    public void onProxyReload(ProxyReloadEvent event) {
         initConfig();
         logger.info("Config reloaded!");
     }

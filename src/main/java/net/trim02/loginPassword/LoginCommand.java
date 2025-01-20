@@ -47,13 +47,7 @@ public class LoginCommand implements SimpleCommand {
             Optional<RegisteredServer> connectToServer = server.getServer(configVar.hubServer);
             player.createConnectionRequest(connectToServer.get()).connectWithIndication();
 
-            if (!player.hasPermission("group." + configVar.bypassGroup) && (configVar.oneTimeLogin && configVar.pluginGrantsBypass) && configVar.bypassMethod.equals("group")) {
-
-                lpApi.getUserManager().modifyUser(player.getUniqueId(), user -> {
-                    user.data().add(Node.builder("group." + configVar.bypassGroup).build());
-                });
-            } else if (!player.hasPermission(configVar.bypassNode) && (configVar.oneTimeLogin && configVar.pluginGrantsBypass) && configVar.bypassMethod.equals("user")) {
-
+            if (!player.hasPermission(configVar.bypassNode) && (configVar.oneTimeLogin && configVar.pluginGrantsBypass)) {
                 lpApi.getUserManager().modifyUser(player.getUniqueId(), user -> {
                     user.data().add(Node.builder(configVar.bypassNode).build());
                 });
@@ -72,19 +66,12 @@ public class LoginCommand implements SimpleCommand {
     @Override
     public boolean hasPermission(final Invocation invocation) {
         boolean sourcePermissionNode = invocation.source().hasPermission(configVar.bypassNode);
-        boolean sourcePermissionGroup = invocation.source().hasPermission("group." + configVar.bypassGroup);
+        // boolean sourcePermissionGroup = invocation.source().hasPermission("group." + configVar.bypassGroup);
+
         if (configVar.loginCommandNegated) {
-            if ((configVar.oneTimeLogin && configVar.disableLoginCommandOnBypass) && ((configVar.bypassMethod.equals("group") && sourcePermissionGroup) || (configVar.bypassMethod.equals("user") && sourcePermissionNode))) {
-
-                return false;
-            } else {
-                return true;
-            }
-
+            return !(configVar.oneTimeLogin && configVar.disableLoginCommandOnBypass && sourcePermissionNode);
         } else {
-            return invocation.source().hasPermission("loginpassword.login");
+            return invocation.source().hasPermission(configVar.loginCommandNode);
         }
-
-
     }
 }

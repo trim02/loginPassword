@@ -33,9 +33,8 @@ public class PlayerConnection {
     public void onPlayerJoin(PlayerChooseInitialServerEvent event) {
         Player player = event.getPlayer();
 
-        if ((configVar.oneTimeLogin) && ((configVar.bypassMethod.equals("group") && player.hasPermission(configVar.bypassGroup)) || ((configVar.bypassMethod.equals("user") && player.hasPermission(configVar.bypassNode))))) {
+        if (configVar.oneTimeLogin && player.hasPermission(configVar.bypassNode)) {
             return;
-
         } else {
             Optional<RegisteredServer> connectToServer = server.getServer(configVar.loginServer);
             event.setInitialServer(connectToServer.get());
@@ -49,11 +48,7 @@ public class PlayerConnection {
         RegisteredServer connectedServer = event.getServer();
 
         if (connectedServer.getServerInfo().getName().equals(configVar.loginServer)) {
-            ScheduledTask task = server.getScheduler().buildTask(plugin, () -> {
-
-                Component kickMessage = ((configVar.kickMessage).equals("default")) ? Component.text("You were kicked for failing to provide the password within " + configVar.kickTimeout + " seconds") : Component.text(configVar.kickMessage);
-                player.disconnect(kickMessage);
-            }).delay(configVar.kickTimeout, TimeUnit.SECONDS).schedule();
+            ScheduledTask task = server.getScheduler().buildTask(plugin, () -> player.disconnect(Component.text(configVar.kickMessage))).delay(configVar.kickTimeout, TimeUnit.SECONDS).schedule();
             hashScheduledPlayerTask.put(player.getUniqueId().hashCode(), String.valueOf(task.toString().hashCode()));
 
         }

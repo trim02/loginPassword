@@ -12,9 +12,9 @@ oneTimeLogin: true
 # group or user. Changes the method the plugins uses to check if a player must log in on every connection
 # if set to user, players must be given the permission node defined in bypassNode.
 # if set to group, players must be added to the group and the group must be created.
-bypassMethod: "group"
+#bypassMethod: "group" DEPRECATED
 # the group to check the player has if bypassMethod is set to group
-bypassGroup: "loginbypass"
+#bypassGroup: "loginbypass" DEPRECATED
 # the permission node to check if a player has set if bypassMethod is set to user
 bypassNode: "loginpassword.bypass"
 # if set to true, the plugin will set either the bypassGroup or the bypassNode when a user logins in
@@ -24,7 +24,7 @@ disableLoginCommandOnBypass: true
 
 # Message to be sent to player if they fail to provide password after kickTimeout. Put "default" to have message read:
 # You were kicked for failing to provide the password after kickTimeout seconds
-kickMessage: "default"
+kickMessage: "You were kicked for failing to provide the password after 30 seconds"
 # The amount of time to wait before kicking the player. In seconds
 kickTimeout: 30
 # Messages to be sent to player when they do not provide or gives a wrong password
@@ -34,4 +34,5 @@ wrongPassword: "Wrong Password."
 # set to false to make the login command only accessible to players with the permission node loginpassword.login.
 # this could be used to have a private server where only some players have access to. oneTimeLogin must be disabled otherwise players with the bypass permissions will always be sent to the private server.
 loginCommandNegated: "true"
+loginCommandNode: "loginpassword.login"
 
