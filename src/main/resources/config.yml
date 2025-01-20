@@ -9,9 +9,9 @@ oneTimeLogin: true
 
 # Bypass settings require oneTimeLogin to be true
 
-# Remember to negate the velocity.server permission in the LuckPerms to prevent players from joining the server without logging in
+# Remember to disallow the velocity.command.server permission on the default group in LuckPerms to prevent players from joining the server without logging in
 
-# the permission node to check if a player has bypass permissions. Must exists either on the user or on a group the user is in
+# the permission node to check if a player has bypass permissions. Must exist either on the user or on a group the user is in
 bypassNode: "loginpassword.bypass"
 # if set to true, the plugin will set grant bypass permission to players
 pluginGrantsBypass: true

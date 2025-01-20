@@ -6,6 +6,7 @@ This plugin is an alternative way to control access to a minecraft server, witho
 
 This plugin is a Velocity plugin, and must be installed on your proxy!
 
+This is NOT a plugin that adds user registration or any of that other stuff you'll find by other authentication plugins on the web. This is a simple plugin to restrict access to your server, without having to maintain a whitelist or using discord integrations and whatnot.
 ## Features
 
 - **Password Authentication**: Players must enter a password to access the server.
@@ -19,7 +20,7 @@ This plugin is a Velocity plugin, and must be installed on your proxy!
 
 **LuckPerms is a required dependency! Install it on your Velocity Proxy!**
 
-**You will need a server to function as a login server. Any minecraft server will do, but I recommend [NanoLimbo](https://github.com/Nan1t/NanoLimbo), as it is extremly lightweight, and will only exist to faclitate login requests**
+**You will need a server to function as a login server. Any minecraft server will do, but I recommend [NanoLimbo](https://github.com/Nan1t/NanoLimbo), as it is extremely lightweight, and will only exist to facilitate login requests**
 
 The plugin uses a YAML configuration file (`config.yml`) to manage its settings. Below are some of the configurable options, comments are included in the file:
 
@@ -43,14 +44,14 @@ The plugin uses a YAML configuration file (`config.yml`) to manage its settings.
 
 - LuckPerms is required!
 - A server to act as a login server is required!
-- It is recommended to negate the permission node `velocity.server` on the default group in LuckPerms, otherwise players will be able to bypass the plugin by directly transferring to the hub server.
+- It is recommended to disallow the permission node `velocity.command.server` on the default group in LuckPerms, otherwise players will be able to bypass the plugin by directly transferring to the hub server.
 
 1. Download the plugin JAR file.
 2. Place the JAR file in the `plugins` directory of your Velocity server.
 3. Start the server to generate the default configuration file.
 4. Edit the `config.yml` file in the `plugins/LoginPassword` directory to suit your needs.
 5. Configure `velocity.toml` by adding the login server to `[servers]` table. If you want `ping-passthrough = "all"` to work correctly, have only the hub server in the `try = []` array, do not add the login server to the array. The plugin will handle redirecting players to the login server.
-5. Restart the server or run `velocity reload` to reload the config.
+6. Restart the server or run `velocity reload` to reload the config.
 
 ## Usage
 
