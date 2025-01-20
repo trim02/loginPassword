@@ -64,3 +64,7 @@ Open an issue or a pull request if you want.
 ## License
 
 This project is licensed under the GNU General Public License v3.0. See the `LICENSE` file for details.
+
+## Misc
+Logo borrowed from [twemoji](https://github.com/twitter/twemoji), CC-BY 4.0.
+
