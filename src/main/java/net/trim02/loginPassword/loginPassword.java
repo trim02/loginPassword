@@ -23,7 +23,7 @@ import java.nio.file.Path;
 
 @Plugin(id = "loginpassword", name = "loginPassword", version = BuildConstants.VERSION, authors = {
         "trim02" }, dependencies = {
-                @Dependency(id = "luckperms")
+                @Dependency(id = "luckperms", optional = true)
         })
 public class loginPassword {
 
@@ -102,15 +102,36 @@ public class loginPassword {
 
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
+        // Class<?> lpApi = null;
+        // if (server.getPluginManager().isLoaded("luckperms")) {
+        // logger.info("LuckPerms found!");
+        // try {
+        // lpApi = Class.forName("net.luckperms.api.LuckPerms");
+        // lpApi.getDeclaredConstructor((Class<?>[]) null).newInstance((Object[]) null);
+        // } catch (ClassNotFoundException | InstantiationException |
+        // IllegalAccessException | IllegalArgumentException | InvocationTargetException
+        // | NoSuchMethodException | SecurityException e) {
+        // logger.error("An error occurred while initializing LuckPerms", e);
+        // }
+        // }
+
         initConfig();
-        logger.info("Plugin ready!");
+        
 
         server.getEventManager().register(this, new PlayerConnection(server, this));
         CommandManager commandManager = server.getCommandManager();
         CommandMeta commandMeta = commandManager.metaBuilder("login").plugin(this).build();
-        SimpleCommand loginCommand = new LoginCommand(server, server.getPluginManager(), logger);
-        commandManager.register(commandMeta, loginCommand);
 
+        if (server.getPluginManager().isLoaded("luckperms")) {
+            logger.info("luckperms found!");
+            SimpleCommand loginCommand = new LoginCommandLuckPerms(server, logger);
+            commandManager.register(commandMeta, loginCommand);
+        } else {
+            SimpleCommand loginCommand = new LoginCommand(server, logger);
+            commandManager.register(commandMeta, loginCommand);
+
+        }
+        logger.info("Plugin ready!");
     }
 
     @Subscribe
