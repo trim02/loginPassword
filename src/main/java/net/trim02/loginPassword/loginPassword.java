@@ -44,8 +44,6 @@ public class loginPassword {
         public static String hubServer;
         public static String serverPassword;
         public static Boolean oneTimeLogin;
-        // public static String bypassMethod;
-        // public static String bypassGroup;
         public static String bypassNode;
         public static Boolean pluginGrantsBypass;
         public static String bypassMethod;
