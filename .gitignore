@@ -21,3 +21,8 @@ gradle-app.setting
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
 .idea/compiler.xml
+.vscode/settings.json
+.idea/.name
+.idea/compiler.xml
+/.idea/
+/.vscode/
