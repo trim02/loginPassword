@@ -2,11 +2,12 @@
 
 ## Overview
 
-This plugin is an alternative way to control access to a minecraft server, without using a whitelist. 
+This plugin is an alternative way to control access to a minecraft server, without using a whitelist.
 
 This plugin is a Velocity plugin, and must be installed on your proxy!
 
 This is NOT a plugin that adds user registration or any of that other stuff you'll find by other authentication plugins on the web. This is a simple plugin to restrict access to your server, without having to maintain a whitelist or using discord integrations and whatnot.
+
 ## Features
 
 - **Password Authentication**: Players must enter a password to access the server.
@@ -18,7 +19,7 @@ This is NOT a plugin that adds user registration or any of that other stuff you'
 
 ## Configuration
 
-**LuckPerms is a required dependency! Install it on your Velocity Proxy!**
+**LuckPerms is required if you want the plugin to grant bypass permissions! Install it on your Velocity Proxy!**
 
 **You will need a server to function as a login server. Any minecraft server will do, but I recommend [NanoLimbo](https://github.com/Nan1t/NanoLimbo), as it is extremely lightweight, and will only exist to facilitate login requests**
 
@@ -42,9 +43,9 @@ The plugin uses a YAML configuration file (`config.yml`) to manage its settings.
 
 ## Installation
 
-- LuckPerms is required!
+- LuckPerms is optional (but recommended)
 - A server to act as a login server is required!
-- It is recommended to disallow the permission node `velocity.command.server` on the default group in LuckPerms, otherwise players will be able to bypass the plugin by directly transferring to the hub server.
+- It is recommended to negate the permission node `velocity.command.server` for all players in your permissions plugin, otherwise players will be able to bypass the plugin by directly transferring to the hub server.
 
 1. Download the plugin JAR file.
 2. Place the JAR file in the `plugins` directory of your Velocity server.
@@ -55,7 +56,7 @@ The plugin uses a YAML configuration file (`config.yml`) to manage its settings.
 
 ## Usage
 
-Once installed and configured, the plugin will prompt players to enter a password upon connecting to the server. Depending on the configuration, players may only need to authenticate once. Administrators can manage permissions using LuckPerms to grant or revoke bypass permissions.
+Once installed and configured, the plugin will prompt players to enter a password upon connecting to the server. Depending on the configuration, players may only need to authenticate once. Administrators can manage permissions using LuckPerms or another permissions plugin to grant or revoke bypass permissions.
 
 ## Contributing
 
@@ -67,4 +68,3 @@ This project is licensed under the GNU Lesser General Public License v2.1. See t
 
 ## Misc
 Logo borrowed from [twemoji](https://github.com/twitter/twemoji), CC-BY 4.0.
-
