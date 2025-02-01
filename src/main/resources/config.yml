@@ -4,16 +4,16 @@ loginServer: "login"
 hubServer: "hub"
 # The password players must input to log in
 serverPassword: "1234"
-# Change to false to make players have to write the password on every connection
+# Change to false to make players have to write the password on every connection.
 oneTimeLogin: true
 
 # Bypass settings require oneTimeLogin to be true
 
-# Remember to disallow the velocity.command.server permission on the default group in LuckPerms to prevent players from joining the server without logging in
+# Remember to disallow the velocity.command.server permission for all players to prevent them from joining the server without logging in first
 
 # the permission node to check if a player has bypass permissions. Must exist either on the user or on a group the user is in
 bypassNode: "loginpassword.bypass"
-# if set to true, the plugin will set grant bypass permission to players
+# if set to true, the plugin will grant bypass permission to players. Requires LuckPerms. If you don't use LuckPerms, you must set the bypass permissions manually
 pluginGrantsBypass: true
 # method to grant bypass permissions. "user" will grant the bypassNode to the player, "group" will add the player to the bypassGroup. the group must exist in the permissions plugin, and multiple groups can exist with the permission node
 bypassMethod: "user"

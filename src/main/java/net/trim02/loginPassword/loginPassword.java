@@ -23,7 +23,7 @@ import java.nio.file.Path;
 
 @Plugin(id = "loginpassword", name = "loginPassword", version = BuildConstants.VERSION, authors = {
         "trim02" }, dependencies = {
-                @Dependency(id = "luckperms")
+                @Dependency(id = "luckperms", optional = true)
         })
 public class loginPassword {
 
@@ -102,15 +102,26 @@ public class loginPassword {
 
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
+        
         initConfig();
-        logger.info("Plugin ready!");
-
+        
         server.getEventManager().register(this, new PlayerConnection(server, this));
         CommandManager commandManager = server.getCommandManager();
         CommandMeta commandMeta = commandManager.metaBuilder("login").plugin(this).build();
-        SimpleCommand loginCommand = new LoginCommand(server, server.getPluginManager(), logger);
-        commandManager.register(commandMeta, loginCommand);
 
+        if (server.getPluginManager().isLoaded("luckperms")) {
+            logger.debug("luckperms found!");
+            SimpleCommand loginCommand = new LoginCommandLuckPerms(server, logger);
+            commandManager.register(commandMeta, loginCommand);
+        } else {
+            if(configVar.pluginGrantsBypass.equals(true) && configVar.oneTimeLogin.equals(true)){
+                logger.warn("pluginGrantsBypass is set to true but LuckPerms is not found. Please disable pluginGrantsBypass in the config file, as this setting will not work without LuckPerms. Bypass permissions must be granted manually.");
+            }
+            SimpleCommand loginCommand = new LoginCommand(server, logger);
+            commandManager.register(commandMeta, loginCommand);
+
+        }
+        logger.info("Plugin ready!");
     }
 
     @Subscribe
