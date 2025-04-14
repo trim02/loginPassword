@@ -1,0 +1,41 @@
+[core]
+	# The server name set in Velocity that is used for logging in
+	loginServer = "login"
+	# The server name set in Velocity that the player will be transferred to after logging in
+	hubServer = "hub"
+	# The password players must input to log in
+	serverPassword = "1234"
+	# Change to false to make players have to write the password on every connection.
+	oneTimeLogin = true
+    # Bypass settings require oneTimeLogin to be true
+[core.bypass]
+	# if set to true, the plugin will grant bypass permission to players. Requires LuckPerms. If you don't use LuckPerms, you must set the bypass permissions manually
+	pluginGrantsBypass = true
+    # Set to false to allow the login command to be used by players with bypass permission
+	disableLoginCommandOnBypass = true  
+
+	# Remember to disallow the velocity.command.server permission for all players to prevent them from joining the server without logging in first
+	# the permission node to check if a player has bypass permissions. Must exist either on the user or on a group the user is in
+	bypassNode = "loginpassword.bypass"
+    [core.bypass.methods]
+    # method to grant bypass permissions. "user" will grant the bypassNode to the player, "group" will add the player to the bypassGroup. the group must exist in the permissions plugin, and multiple groups can exist with the permission node
+	bypassMethod = "user"
+	bypassGroup = "default"
+  
+[core.kick]
+	# The amount of time to wait before kicking the player. In seconds
+	kickTimeout = 30
+	# Message to be sent to player if they fail to provide password after kickTimeout.
+	kickMessage = "You were kicked for failing to provide the password after 30 seconds"
+[messages]
+	# Messages to be sent to player when they do not provide or gives a wrong password
+    wrongPassword = "Wrong Password."
+	noPassword = "Please provide a password. It can be found on Discord"
+
+
+[misc]
+	configVersion = "1.4-SNAPSHOT"
+	# set to false to make the login command only accessible to players with the permission node loginpassword.login.
+	# this could be used to have a private server where only some players have access to. oneTimeLogin must be disabled otherwise players with the bypass permissions will always be sent to the private server.
+	loginCommandGrantedToEveryone = true
+	loginCommandNode = "loginpassword.login"
