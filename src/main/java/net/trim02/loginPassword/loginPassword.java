@@ -1,6 +1,7 @@
 package net.trim02.loginPassword;
 
 import com.google.inject.Inject;
+import com.technicjelle.UpdateChecker;
 import com.velocitypowered.api.command.CommandManager;
 import com.velocitypowered.api.command.CommandMeta;
 import com.velocitypowered.api.command.SimpleCommand;
@@ -15,11 +16,11 @@ import org.slf4j.Logger;
 import org.spongepowered.configurate.CommentedConfigurationNode;
 import org.spongepowered.configurate.ConfigurateException;
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.concurrent.TimeUnit;
 
 @Plugin(id = "loginpassword", name = "loginPassword", version = BuildConstants.VERSION, authors = {
         "trim02" }, dependencies = {
@@ -102,6 +103,27 @@ public class loginPassword {
 
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
+        
+        UpdateChecker updateChecker = new UpdateChecker("trim02", "loginPassword", BuildConstants.VERSION);
+        server.getScheduler().buildTask(this, () -> {
+            try {
+                updateChecker.check();
+                if (updateChecker.isUpdateAvailable()) {
+
+                    var updateMessage = """
+                            A new version is available: %s -> %s. Download the new version here:
+                            modrinth: https://modrinth.com/plugin/loginpassword
+                            Hangar: https://hangar.papermc.io/trim02/loginPassword
+                            GitHub: %s
+                            """.formatted(updateChecker.getCurrentVersion(), updateChecker.getLatestVersion(), updateChecker.getUpdateUrl());
+
+                    logger.warn(updateMessage);
+                }
+            } catch (RuntimeException e) {
+                throw new RuntimeException(e);
+            }
+        }).repeat(7, TimeUnit.DAYS).schedule();
+
         
         initConfig();
         
