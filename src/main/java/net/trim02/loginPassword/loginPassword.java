@@ -1,5 +1,6 @@
 package net.trim02.loginPassword;
 
+import com.electronwill.nightconfig.core.file.FileConfig;
 import com.google.inject.Inject;
 import com.technicjelle.UpdateChecker;
 import com.velocitypowered.api.command.CommandManager;
@@ -21,6 +22,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
+
 
 @Plugin(id = "loginpassword", name = "loginPassword", version = BuildConstants.VERSION, authors = {
         "trim02" }, dependencies = {
@@ -56,10 +58,11 @@ public class loginPassword {
         public static String wrongPassword;
         public static Boolean loginCommandNegated;
         public static String loginCommandNode;
+        public static String configVersion;
 
     }
 
-    public void initConfig() {
+    public void initConfigOld() {
         if (Files.notExists(dataDirectory)) {
             try {
                 Files.createDirectory(dataDirectory);
@@ -101,6 +104,249 @@ public class loginPassword {
 
     }
 
+    public void getTomlConfig(Path configFile) {
+        if (Files.notExists(dataDirectory)) {
+            try {
+                Files.createDirectory(dataDirectory);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        // final Path configFile = dataDirectory.resolve("config.toml");
+        if (Files.notExists(configFile)) {
+            try (InputStream stream = this.getClass().getClassLoader().getResourceAsStream("config.toml")) {
+                Files.copy(stream, configFile);
+
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        FileConfig config = FileConfig.of(configFile);
+        config.load();
+        configVar.loginServer = config.get("core.loginServer");
+        configVar.hubServer = config.get("core.hubServer");
+        configVar.serverPassword = config.get("core.serverPassword");
+        configVar.oneTimeLogin = config.get("core.oneTimeLogin");
+        configVar.pluginGrantsBypass = config.get("core.bypass.pluginGrantsBypass");
+        configVar.disableLoginCommandOnBypass = config.get("core.bypass.disableLoginCommandOnBypass");
+        configVar.bypassNode = config.get("core.bypass.bypassNode");
+        configVar.bypassMethod = config.get("core.bypass.methods.bypassMethod");
+        configVar.bypassGroup = config.get("core.bypass.methods.bypassGroup");
+        configVar.kickMessage = config.get("core.kick.kickMessage");
+        configVar.kickTimeout = Long.getLong(config.get("core.kick.kickTimeout").toString());
+        configVar.noPassword = config.get("core.messages.noPassword");
+        configVar.wrongPassword = config.get("core.messages.wrongPassword");
+        configVar.loginCommandNegated = config.get("misc.loginCommandGrantedToEveryone");
+        configVar.loginCommandNode = config.get("misc.loginCommandNode");
+        configVar.configVersion = config.get("misc.configVersion");
+        
+
+    }
+
+
+    public void initConfig() throws IOException {
+        if (Files.notExists(dataDirectory)) {
+            try {
+                Files.createDirectory(dataDirectory);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        final Path configFile = dataDirectory.resolve("config.toml");
+        if (Files.notExists(configFile)) {
+            try (InputStream stream = this.getClass().getClassLoader().getResourceAsStream("config.toml")) {
+                Files.copy(stream, configFile);
+
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        // Check if the config file is empty
+        if (Files.size(configFile) == 0) {
+            try (InputStream stream = this.getClass().getClassLoader().getResourceAsStream("config.toml")) {
+                Files.copy(stream, configFile);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        getTomlConfig(configFile);
+        // Check if local config file version value is different from plugin version
+        if(!configVar.configVersion.equals(BuildConstants.VERSION)){
+            logger.warn("Config file version is different from plugin version. Migrating config file to new version.");
+            migrateConfigVersion();
+        }
+        // Check if old yaml config file exists
+        if (Files.exists(dataDirectory.resolve("config.yml"))) {
+            logger.warn("Old config file found. Migrating to new config file format.");
+            migrateYamlToToml();
+            initConfig();
+        }
+    }
+
+    public void migrateConfigVersion() {
+        Path templateConfigFile = null;
+        try {
+            templateConfigFile = Files.createTempFile(dataDirectory, "configTemp", ".toml");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        InputStream templateStream = this.getClass().getClassLoader().getResourceAsStream("config.toml");
+       try {
+           Files.copy(templateStream, templateConfigFile, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+       } catch (IOException e) {
+           throw new RuntimeException(e);
+       }
+       Path configFile = dataDirectory.resolve("config.toml");
+
+       FileConfig templateConfig = FileConfig.of(templateConfigFile);
+       FileConfig config = FileConfig.of(configFile);
+       templateConfig.load();
+    //    System.err.println("Template Config values:");
+    //    System.err.println("core.loginServer: " + templateConfig.get("core.loginServer"));
+    //    System.err.println("core.hubServer: " + templateConfig.get("core.hubServer"));
+    //    System.err.println("core.serverPassword: " + templateConfig.get("core.serverPassword"));
+    //    System.err.println("core.oneTimeLogin: " + templateConfig.get("core.oneTimeLogin"));
+    //    System.err.println("core.bypass.pluginGrantsBypass: " + templateConfig.get("core.bypass.pluginGrantsBypass"));
+    //    System.err.println("core.bypass.disableLoginCommandOnBypass: " + templateConfig.get("core.bypass.disableLoginCommandOnBypass"));
+    //    System.err.println("core.bypass.bypassNode: " + templateConfig.get("core.bypass.bypassNode"));
+    //    System.err.println("core.bypass.methods.bypassMethod: " + templateConfig.get("core.bypass.methods.bypassMethod"));
+    //    System.err.println("core.bypass.methods.bypassGroup: " + templateConfig.get("core.bypass.methods.bypassGroup"));
+    //    System.err.println("core.kick.kickMessage: " + templateConfig.get("core.kick.kickMessage"));
+    //    System.err.println("core.kick.kickTimeout: " + templateConfig.get("core.kick.kickTimeout"));
+    //    System.err.println("messages.noPassword: " + templateConfig.get("messages.noPassword"));
+    //    System.err.println("messages.wrongPassword: " + templateConfig.get("messages.wrongPassword"));
+    //    System.err.println("misc.loginCommandGrantedToEveryone: " + templateConfig.get("misc.loginCommandGrantedToEveryone"));
+    //    System.err.println("misc.loginCommandNode: " + templateConfig.get("misc.loginCommandNode"));
+    //    System.err.println("misc.configVersion: " + templateConfig.get("misc.configVersion"));
+    //    System.err.println("Build Version: " + BuildConstants.VERSION);
+       config.load();
+    //    System.err.println("Local Config values:");
+    //    System.err.println("core.loginServer: " + config.get("core.loginServer"));
+    //    System.err.println("core.hubServer: " + config.get("core.hubServer"));
+    //    System.err.println("core.serverPassword: " + config.get("core.serverPassword"));
+    //    System.err.println("core.oneTimeLogin: " + config.get("core.oneTimeLogin"));
+    //    System.err.println("core.bypass.pluginGrantsBypass: " + config.get("core.bypass.pluginGrantsBypass"));
+    //    System.err.println("core.bypass.disableLoginCommandOnBypass: " + config.get("core.bypass.disableLoginCommandOnBypass"));
+    //    System.err.println("core.bypass.bypassNode: " + config.get("core.bypass.bypassNode"));
+    //    System.err.println("core.bypass.methods.bypassMethod: " + config.get("core.bypass.methods.bypassMethod"));
+    //    System.err.println("core.bypass.methods.bypassGroup: " + config.get("core.bypass.methods.bypassGroup"));
+    //    System.err.println("core.kick.kickMessage: " + config.get("core.kick.kickMessage"));
+    //    System.err.println("core.kick.kickTimeout: " + config.get("core.kick.kickTimeout"));
+    //    System.err.println("messages.noPassword: " + config.get("messages.noPassword"));
+    //    System.err.println("messages.wrongPassword: " + config.get("messages.wrongPassword"));
+    //    System.err.println("misc.loginCommandGrantedToEveryone: " + config.get("misc.loginCommandGrantedToEveryone"));
+    //    System.err.println("misc.loginCommandNode: " + config.get("misc.loginCommandNode"));
+    //    System.err.println("misc.configVersion: " + config.get("misc.configVersion"));
+    //    System.err.println("Build Version: " + BuildConstants.VERSION);
+       templateConfig.set("core.loginServer", config.get("core.loginServer"));
+       templateConfig.set("core.hubServer", config.get("core.hubServer"));
+       templateConfig.set("core.serverPassword", config.get("core.serverPassword"));
+       templateConfig.set("core.oneTimeLogin", config.get("core.oneTimeLogin"));
+       templateConfig.set("core.bypass.pluginGrantsBypass", config.get("core.bypass.pluginGrantsBypass"));
+       templateConfig.set("core.bypass.disableLoginCommandOnBypass", config.get("core.bypass.disableLoginCommandOnBypass"));
+       templateConfig.set("core.bypass.bypassNode", config.get("core.bypass.bypassNode"));
+       templateConfig.set("core.bypass.methods.bypassMethod", config.get("core.bypass.methods.bypassMethod"));
+       templateConfig.set("core.bypass.methods.bypassGroup", config.get("core.bypass.methods.bypassGroup"));
+       templateConfig.set("core.kick.kickMessage", config.get("core.kick.kickMessage"));
+       templateConfig.set("core.kick.kickTimeout", config.get("core.kick.kickTimeout"));
+       templateConfig.set("messages.noPassword", config.get("messages.noPassword"));
+       templateConfig.set("messages.wrongPassword", config.get("messages.wrongPassword"));
+       templateConfig.set("misc.loginCommandGrantedToEveryone", config.get("misc.loginCommandGrantedToEveryone"));
+       templateConfig.set("misc.loginCommandNode", config.get("misc.loginCommandNode"));
+
+    //    System.err.println("New Config values:");
+    //    System.err.println("core.loginServer: " + templateConfig.get("core.loginServer"));
+    //      System.err.println("core.hubServer: " + templateConfig.get("core.hubServer"));
+    //      System.err.println("core.serverPassword: " + templateConfig.get("core.serverPassword"));
+    //         System.err.println("core.oneTimeLogin: " + templateConfig.get("core.oneTimeLogin"));
+    //         System.err.println("core.bypass.pluginGrantsBypass: " + templateConfig.get("core.bypass.pluginGrantsBypass"));
+    //         System.err.println("core.bypass.disableLoginCommandOnBypass: " + templateConfig.get("core.bypass.disableLoginCommandOnBypass"));
+    //         System.err.println("core.bypass.bypassNode: " + templateConfig.get("core.bypass.bypassNode"));
+    //         System.err.println("core.bypass.methods.bypassMethod: " + templateConfig.get("core.bypass.methods.bypassMethod"));
+    //         System.err.println("core.bypass.methods.bypassGroup: " + templateConfig.get("core.bypass.methods.bypassGroup"));
+    //         System.err.println("core.kick.kickMessage: " + templateConfig.get("core.kick.kickMessage"));
+    //         System.err.println("core.kick.kickTimeout: " + templateConfig.get("core.kick.kickTimeout"));
+    //         System.err.println("messages.noPassword: " + templateConfig.get("messages.noPassword"));
+    //         System.err.println("messages.wrongPassword: " + templateConfig.get("messages.wrongPassword"));
+    //         System.err.println("misc.loginCommandGrantedToEveryone: " + templateConfig.get("misc.loginCommandGrantedToEveryone"));
+    //         System.err.println("misc.loginCommandNode: " + templateConfig.get("misc.loginCommandNode"));
+    //         System.err.println("misc.configVersion: " + templateConfig.get("misc.configVersion"));
+    //         System.err.println("Build Version: " + BuildConstants.VERSION);
+
+
+
+
+       templateConfig.save();
+       templateConfig.close();
+       try {
+            Files.copy(templateConfigFile, configFile, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            Files.delete(templateConfigFile);
+       }
+         catch (IOException e) {
+                throw new RuntimeException(e);
+         }
+
+
+
+    }
+    public void migrateYamlToToml() {
+        Path yamlFile = dataDirectory.resolve("config.yml");
+        Path tomlFile = dataDirectory.resolve("config.toml");
+        FileConfig config = FileConfig.of(tomlFile);
+        config.load();
+        final YamlConfigurationLoader loader = YamlConfigurationLoader.builder().path(yamlFile).build();
+        final CommentedConfigurationNode node;
+        try {
+            node = loader.load();
+        } catch (ConfigurateException e) {
+            throw new RuntimeException(e);
+        }
+        config.set("core.loginServer",node.node("loginServer").getString());
+        config.set("core.hubServer",node.node("hubServer").getString());
+        config.set("core.serverPassword",node.node("serverPassword").getString());
+        config.set("core.oneTimeLogin",node.node("oneTimeLogin").getBoolean());
+        config.set("core.bypass.pluginGrantsBypass",node.node("pluginGrantsBypass").getBoolean());
+        config.set("core.bypass.disableLoginCommandOnBypass",node.node("disableLoginCommandOnBypass").getBoolean());
+        config.set("core.bypass.bypassNode",node.node("bypassNode").getString());
+        config.set("core.bypass.methods.bypassMethod",node.node("bypassMethod").getString());
+        config.set("core.bypass.methods.bypassGroup",node.node("bypassGroup").getString());
+        config.set("core.kick.kickMessage",node.node("kickMessage").getString());
+        config.set("core.kick.kickTimeout",node.node("kickTimeout").getLong());
+        config.set("messages.noPassword",node.node("noPassword").getString());
+        config.set("messages.wrongPassword",node.node("wrongPassword").getString());
+        config.set("misc.loginCommandGrantedToEveryone",node.node("loginCommandGrantedToEveryone").getBoolean());
+        config.set("misc.loginCommandNode",node.node("loginCommandNode").getString());
+        
+        config.save();
+        config.close();
+        try {
+            Files.delete(yamlFile);
+            logger.info("Old config file deleted.");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        
+    }
+
+
+
+
+
+
+
+
+
+    public Boolean setConfigValue(String key, Object value) {
+        FileConfig config = FileConfig.of(dataDirectory.resolve("config.toml"));
+        config.load();
+        config.set(key, value);
+        config.save();
+        config.close();
+        return true;
+    }
+    
+
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
         
@@ -125,8 +371,15 @@ public class loginPassword {
         }).repeat(7, TimeUnit.DAYS).schedule();
 
         
-        initConfig();
+        try {
+            initConfig();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         
+
+
+
         server.getEventManager().register(this, new PlayerConnection(server, this));
         CommandManager commandManager = server.getCommandManager();
         CommandMeta commandMeta = commandManager.metaBuilder("login").plugin(this).build();
@@ -148,7 +401,11 @@ public class loginPassword {
 
     @Subscribe
     public void onProxyReload(ProxyReloadEvent event) {
-        initConfig();
+        try {
+            initConfig();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         logger.info("Config reloaded!");
     }
 }
