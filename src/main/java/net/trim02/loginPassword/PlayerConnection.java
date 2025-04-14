@@ -47,7 +47,7 @@ public class PlayerConnection {
         Player player = event.getPlayer();
         RegisteredServer connectedServer = event.getServer();
 
-        if (connectedServer.getServerInfo().getName().equals(configVar.loginServer)) {
+        if (connectedServer.getServerInfo().getName().equals(configVar.loginServer) && configVar.loginCommandNegated.equals(true)) {
             ScheduledTask task = server.getScheduler().buildTask(plugin, () -> player.disconnect(Component.text(configVar.kickMessage))).delay(configVar.kickTimeout, TimeUnit.SECONDS).schedule();
             hashScheduledPlayerTask.put(player.getUniqueId().hashCode(), String.valueOf(task.toString().hashCode()));
 
