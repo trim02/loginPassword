@@ -42,6 +42,7 @@ public class Config {
         public static Integer kickTimeout;
         public static String noPassword;
         public static String wrongPassword;
+        public static String welcomeMessage;
         public static Boolean loginCommandNegated;
         public static String loginCommandNode;
         public static String configVersion;
@@ -79,6 +80,7 @@ public class Config {
         if(!configVar.configVersion.equals(BuildConstants.VERSION)){
             // logger.warn("Config file version is different from plugin version. Migrating config file to new version.");
             migrateConfigVersion();
+            initConfig();
         }
         // Check if old yaml config file exists
         if (Files.exists(dataDirectory.resolve("config.yml"))) {
@@ -121,6 +123,7 @@ public class Config {
         configVar.kickTimeout = config.get("core.kick.kickTimeout");
         configVar.noPassword = config.get("messages.noPassword");
         configVar.wrongPassword = config.get("messages.wrongPassword");
+        configVar.welcomeMessage = config.get("messages.welcomeMessage");
         configVar.loginCommandNegated = config.get("misc.loginCommandGrantedToEveryone");
         configVar.loginCommandNode = config.get("misc.loginCommandNode");
         configVar.configVersion = config.get("misc.configVersion");
@@ -196,6 +199,7 @@ public class Config {
         templateConfig.set("core.kick.kickTimeout", config.get("core.kick.kickTimeout"));
         templateConfig.set("messages.noPassword", config.get("messages.noPassword"));
         templateConfig.set("messages.wrongPassword", config.get("messages.wrongPassword"));
+        templateConfig.set("messages.welcomeMessage", config.get("messages.welcomeMessage"));
         templateConfig.set("misc.loginCommandGrantedToEveryone", config.get("misc.loginCommandGrantedToEveryone"));
         templateConfig.set("misc.loginCommandNode", config.get("misc.loginCommandNode"));
         templateConfig.set("misc.pluginEnabled", config.get("misc.pluginEnabled"));

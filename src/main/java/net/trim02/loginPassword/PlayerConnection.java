@@ -8,6 +8,7 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.scheduler.ScheduledTask;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.trim02.loginPassword.Config.configVar;
 
 import java.util.Collection;
@@ -38,6 +39,7 @@ public class PlayerConnection {
         } else {
             Optional<RegisteredServer> connectToServer = server.getServer(configVar.loginServer);
             event.setInitialServer(connectToServer.get());
+            player.sendMessage(Component.text(configVar.welcomeMessage, NamedTextColor.GREEN));
         }
     }
 
