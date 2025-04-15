@@ -8,7 +8,7 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.scheduler.ScheduledTask;
 import net.kyori.adventure.text.Component;
-import net.trim02.loginPassword.loginPassword.configVar;
+import net.trim02.loginPassword.Config.configVar;
 
 import java.util.Collection;
 import java.util.HashMap;

@@ -8,7 +8,7 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.trim02.loginPassword.loginPassword.configVar;
+import net.trim02.loginPassword.Config.configVar;
 import org.slf4j.Logger;
 
 import java.util.Optional;

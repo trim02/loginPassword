@@ -11,7 +11,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.node.Node;
-import net.trim02.loginPassword.loginPassword.configVar;
+import net.trim02.loginPassword.Config.configVar;
 
 import java.util.Optional;
 
