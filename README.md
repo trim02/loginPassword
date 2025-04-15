@@ -23,23 +23,34 @@ This is NOT a plugin that adds user registration or any of that other stuff you'
 
 **You will need a server to function as a login server. Any minecraft server will do, but I recommend [NanoLimbo](https://github.com/Nan1t/NanoLimbo), as it is extremely lightweight, and will only exist to facilitate login requests**
 
-The plugin uses a YAML configuration file (`config.yml`) to manage its settings. Below are some of the configurable options, comments are included in the file:
+**It is recommended to set the permission node `velocity.command.server` to false in your permission plugins default everyone group, otherwise players will be able to bypass the plugin!**
 
+
+The plugin uses a TOML configuration file (`config.toml`) to manage its settings. Below are some of the configurable options, comments are included in the file:
+#### core
 - `loginServer`: The server where players are redirected for login.
 - `hubServer`: The main server.
 - `serverPassword`: The password required for login.
 - `oneTimeLogin`: Boolean to enable/disable one-time login. Default is `true`.
+#### core.bypass
 - `bypassNode`: The permission node for bypassing login.
 - `pluginGrantsBypass`: Boolean to enable/disable plugin-granted bypass. Default is `true`.
+- `disableLoginCommandOnBypass`: Boolean to disable login command if bypass is granted. Default is `true`.
+#### core.bypass.methods
 - `bypassMethod`: Method to grant bypass permissions. Options are `user` or `group`.
 - `bypassGroup`: The group to add the player to if `bypassMethod` is `group`.
-- `disableLoginCommandOnBypass`: Boolean to disable login command if bypass is granted. Default is `true`.
+#### core.kick
 - `kickMessage`: Message displayed when a player is kicked.
-- `kickTimeout`: Timeout duration before a player is kicked.
+- `kickTimeout`: Timeout duration before a player is kicked, in seconds.
+#### messages
 - `noPassword`: Message displayed when no password is provided.
 - `wrongPassword`: Message displayed when the wrong password is provided.
+- `welcomeMessage`: Message to be displayed when someone joins the login server.
+#### misc
 - `loginCommandGrantedToEveryone`: Boolean to grant the login command to everyone. Default is `true`.
 - `loginCommandNode`: The permission node for the login command. Default is `loginpassword.login`.
+- `pluginEnabled`: Boolean to enable/disable the plugin. Default is `true`.
+- `configVersion`: Version of the plugin this config file was last migrated to. Do not touch.
 
 ## Installation
 
@@ -50,13 +61,16 @@ The plugin uses a YAML configuration file (`config.yml`) to manage its settings.
 1. Download the plugin JAR file.
 2. Place the JAR file in the `plugins` directory of your Velocity server.
 3. Start the server to generate the default configuration file.
-4. Edit the `config.yml` file in the `plugins/LoginPassword` directory to suit your needs.
+4. Edit the `config.toml` file in the `plugins/LoginPassword` directory to suit your needs.
 5. Configure `velocity.toml` by adding the login server to `[servers]` table. If you want `ping-passthrough = "all"` to work correctly, have only the hub server in the `try = []` array, do not add the login server to the array. The plugin will handle redirecting players to the login server.
-6. Restart the server or run `velocity reload` to reload all plugins.
+6. Restart the server or run `velocity reload` to reload all plugins and apply the new `velocity.toml`.
+7. For future changes to `config.toml`, apply the changes using `loginpassword reload`
 
 ## Usage
 
 Once installed and configured, the plugin will prompt players to enter a password upon connecting to the server. Depending on the configuration, players may only need to authenticate once. Administrators can manage permissions using LuckPerms or another permissions plugin to grant or revoke bypass permissions.
+
+I encourage you to look at NanoLimbo's `settings.yml` as well, to see if there are any changes you want to make to the default join messages that appear.
 
 ## Contributing
 
