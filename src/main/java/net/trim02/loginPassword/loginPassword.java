@@ -58,7 +58,7 @@ public class loginPassword {
                             GitHub: %s
                             """.formatted(updateChecker.getCurrentVersion(), updateChecker.getLatestVersion(), updateChecker.getUpdateUrl());
 
-                    logger.warn(updateMessage);
+                    logger.info(updateMessage);
                 }
             } catch (RuntimeException e) {
                 throw new RuntimeException(e);
