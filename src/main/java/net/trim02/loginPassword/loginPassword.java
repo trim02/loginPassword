@@ -77,20 +77,23 @@ public class loginPassword {
 
         server.getEventManager().register(this, new PlayerConnection(server, this));
         CommandManager commandManager = server.getCommandManager();
-        CommandMeta commandMeta = commandManager.metaBuilder("login").plugin(this).build();
+        CommandMeta commandMetaLogin = commandManager.metaBuilder("login").plugin(this).build();
+        CommandMeta commandMetaAdmin = commandManager.metaBuilder("loginpassword").plugin(this).build();
 
         if (server.getPluginManager().isLoaded("luckperms")) {
             logger.debug("luckperms found!");
             SimpleCommand loginCommand = new LoginCommandLuckPerms(server, logger);
-            commandManager.register(commandMeta, loginCommand);
+            commandManager.register(commandMetaLogin, loginCommand);
         } else {
             if(configVar.pluginGrantsBypass.equals(true) && configVar.oneTimeLogin.equals(true)){
                 logger.warn("pluginGrantsBypass is set to true but LuckPerms is not found. Please disable pluginGrantsBypass in the config file, as this setting will not work without LuckPerms. Bypass permissions must be granted manually.");
             }
             SimpleCommand loginCommand = new LoginCommand(server, logger);
-            commandManager.register(commandMeta, loginCommand);
+            commandManager.register(commandMetaLogin, loginCommand);
 
         }
+        SimpleCommand adminCommand = new AdminCommand(server, logger, config);
+        commandManager.register(commandMetaAdmin, adminCommand);
         logger.info("Plugin ready!");
     }
 
