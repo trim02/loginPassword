@@ -18,7 +18,7 @@
 	# the permission node to check if a player has bypass permissions. Must exist either on the user or on a group the user is in
 	bypassNode = "loginpassword.bypass"
     [core.bypass.methods]
-    # method to grant bypass permissions. "user" will grant the bypassNode to the player, "group" will add the player to the bypassGroup. the group must exist in the permissions plugin, and multiple groups can exist with the permission node
+    # method to grant bypass permissions. "user" will grant the bypassNode to the player, "group" will add the player to the bypassGroup. the group must exist in the permissions plugin, and multiple groups can exist with the permission node.
 	bypassMethod = "user"
 	bypassGroup = "default"
   
