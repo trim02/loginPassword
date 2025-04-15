@@ -1,6 +1,8 @@
 package net.trim02.loginPassword;
 
+
 import com.google.inject.Inject;
+import com.technicjelle.UpdateChecker;
 import com.velocitypowered.api.command.CommandManager;
 import com.velocitypowered.api.command.CommandMeta;
 import com.velocitypowered.api.command.SimpleCommand;
@@ -12,14 +14,12 @@ import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 import org.slf4j.Logger;
-import org.spongepowered.configurate.CommentedConfigurationNode;
-import org.spongepowered.configurate.ConfigurateException;
-import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.concurrent.TimeUnit;
+
+import net.trim02.loginPassword.Config.configVar;
 
 @Plugin(id = "loginpassword", name = "loginPassword", version = BuildConstants.VERSION, authors = {
         "trim02" }, dependencies = {
@@ -30,103 +30,80 @@ public class loginPassword {
     private final ProxyServer server;
     private final Logger logger;
     private final Path dataDirectory;
+    private final Config config;
 
     @Inject
     public loginPassword(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
         this.server = server;
         this.logger = logger;
         this.dataDirectory = dataDirectory;
+        this.config = new Config(this, server, logger, dataDirectory);
 
     }
 
-    public class configVar {
-        public static String loginServer;
-        public static String hubServer;
-        public static String serverPassword;
-        public static Boolean oneTimeLogin;
-        public static String bypassNode;
-        public static Boolean pluginGrantsBypass;
-        public static String bypassMethod;
-        public static String bypassGroup;
-        public static Boolean disableLoginCommandOnBypass;
-        public static String kickMessage;
-        public static Long kickTimeout;
-        public static String noPassword;
-        public static String wrongPassword;
-        public static Boolean loginCommandNegated;
-        public static String loginCommandNode;
-
-    }
-
-    public void initConfig() {
-        if (Files.notExists(dataDirectory)) {
-            try {
-                Files.createDirectory(dataDirectory);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        final Path config = dataDirectory.resolve("config.yml");
-        if (Files.notExists(config)) {
-            try (InputStream stream = this.getClass().getClassLoader().getResourceAsStream("config.yml")) {
-                Files.copy(stream, config);
-
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        final YamlConfigurationLoader loader = YamlConfigurationLoader.builder().path(config).build();
-        final CommentedConfigurationNode node;
-        try {
-            node = loader.load();
-        } catch (ConfigurateException e) {
-            throw new RuntimeException(e);
-        }
-        configVar.loginServer = node.node("loginServer").getString();
-        configVar.hubServer = node.node("hubServer").getString();
-        configVar.serverPassword = node.node("serverPassword").getString();
-        configVar.oneTimeLogin = node.node("oneTimeLogin").getBoolean();
-        configVar.bypassMethod = node.node("bypassMethod").getString();
-        configVar.bypassGroup = node.node("bypassGroup").getString();
-        configVar.bypassNode = node.node("bypassNode").getString();
-        configVar.pluginGrantsBypass = node.node("pluginGrantsBypass").getBoolean();
-        configVar.disableLoginCommandOnBypass = node.node("disableLoginCommandOnBypass").getBoolean();
-        configVar.kickMessage = node.node("kickMessage").getString();
-        configVar.kickTimeout = node.node("kickTimeout").getLong();
-        configVar.noPassword = node.node("noPassword").getString();
-        configVar.wrongPassword = node.node("wrongPassword").getString();
-        configVar.loginCommandNegated = node.node("loginCommandGrantedToEveryone").getBoolean();
-        configVar.loginCommandNode = node.node("loginCommandNode").getString();
-
-    }
 
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
         
-        initConfig();
+        UpdateChecker updateChecker = new UpdateChecker("trim02", "loginPassword", BuildConstants.VERSION);
+        server.getScheduler().buildTask(this, () -> {
+            try {
+                updateChecker.check();
+                if (updateChecker.isUpdateAvailable()) {
+
+                    var updateMessage = """
+                            A new version is available: %s -> %s. Download the new version here:
+                            modrinth: https://modrinth.com/plugin/loginpassword
+                            Hangar: https://hangar.papermc.io/trim02/loginPassword
+                            GitHub: %s
+                            """.formatted(updateChecker.getCurrentVersion(), updateChecker.getLatestVersion(), updateChecker.getUpdateUrl());
+
+                    logger.info(updateMessage);
+                }
+            } catch (RuntimeException e) {
+                throw new RuntimeException(e);
+            }
+        }).repeat(7, TimeUnit.DAYS).schedule();
+
         
+        try {
+            config.initConfig();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        
+
+
+
         server.getEventManager().register(this, new PlayerConnection(server, this));
         CommandManager commandManager = server.getCommandManager();
-        CommandMeta commandMeta = commandManager.metaBuilder("login").plugin(this).build();
+        CommandMeta commandMetaLogin = commandManager.metaBuilder("login").plugin(this).build();
+        CommandMeta commandMetaAdmin = commandManager.metaBuilder("loginpassword").plugin(this).build();
 
         if (server.getPluginManager().isLoaded("luckperms")) {
             logger.debug("luckperms found!");
             SimpleCommand loginCommand = new LoginCommandLuckPerms(server, logger);
-            commandManager.register(commandMeta, loginCommand);
+            commandManager.register(commandMetaLogin, loginCommand);
         } else {
             if(configVar.pluginGrantsBypass.equals(true) && configVar.oneTimeLogin.equals(true)){
                 logger.warn("pluginGrantsBypass is set to true but LuckPerms is not found. Please disable pluginGrantsBypass in the config file, as this setting will not work without LuckPerms. Bypass permissions must be granted manually.");
             }
             SimpleCommand loginCommand = new LoginCommand(server, logger);
-            commandManager.register(commandMeta, loginCommand);
+            commandManager.register(commandMetaLogin, loginCommand);
 
         }
+        SimpleCommand adminCommand = new AdminCommand(server, logger, config);
+        commandManager.register(commandMetaAdmin, adminCommand);
         logger.info("Plugin ready!");
     }
 
     @Subscribe
     public void onProxyReload(ProxyReloadEvent event) {
-        initConfig();
+        try {
+           config.initConfig();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         logger.info("Config reloaded!");
     }
 }
