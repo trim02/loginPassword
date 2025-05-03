@@ -75,7 +75,7 @@ public class loginPassword {
 
 
 
-        server.getEventManager().register(this, new PlayerConnection(server, this));
+        server.getEventManager().register(this, new PlayerConnection(server, this, logger));
         CommandManager commandManager = server.getCommandManager();
         CommandMeta commandMetaLogin = commandManager.metaBuilder("login").plugin(this).build();
         CommandMeta commandMetaAdmin = commandManager.metaBuilder("loginpassword").plugin(this).build();
