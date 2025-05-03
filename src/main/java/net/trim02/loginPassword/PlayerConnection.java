@@ -100,4 +100,19 @@ public class PlayerConnection {
         }
     }
 
+    // Check if the player was kicked from the login server due to an unsupported client version
+    @Subscribe
+    public void onPlayerKick(KickedFromServerEvent event) {
+
+        String serverPlayerKicked = event.getServer().getServerInfo().getName();
+        String kickReason = PlainTextComponentSerializer.plainText().serialize(event.getServerKickReason().orElseThrow());
+
+
+        if (serverPlayerKicked.equals(configVar.loginServer) && kickReason.equals("Unsupported client version")) {
+            event.setResult(KickedFromServerEvent.DisconnectPlayer.create(Component.text("Unsupported client version. Please contact an admin.", NamedTextColor.RED)));
+            logger.error("A player attempted to connect to the login server with version {} and failed. Please check if the login server is updated.", event.getPlayer().getProtocolVersion());
+
+        }
+    }
+
 }
