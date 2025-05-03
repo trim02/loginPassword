@@ -26,3 +26,4 @@ gradle-app.setting
 .idea/compiler.xml
 /.idea/
 /.vscode/
+/run/
