@@ -1,6 +1,7 @@
 package net.trim02.loginPassword;
 
 import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.event.player.KickedFromServerEvent;
 import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent;
 import com.velocitypowered.api.event.player.ServerConnectedEvent;
 import com.velocitypowered.api.proxy.Player;
@@ -9,22 +10,27 @@ import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.scheduler.ScheduledTask;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.trim02.loginPassword.Config.configVar;
+import org.slf4j.Logger;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 public class PlayerConnection {
     private final ProxyServer server;
     private final loginPassword plugin;
+    private final Logger logger;
     static HashMap<Integer, String> hashScheduledPlayerTask = new HashMap<>();
 
-    public PlayerConnection(ProxyServer server, loginPassword plugin) {
+    public PlayerConnection(ProxyServer server, loginPassword plugin, Logger logger) {
         this.server = server;
         this.plugin = plugin;
+        this.logger = logger;
 
     }
 
@@ -38,8 +44,20 @@ public class PlayerConnection {
             return;
         } else {
             Optional<RegisteredServer> connectToServer = server.getServer(configVar.loginServer);
-            event.setInitialServer(connectToServer.get());
-            player.sendMessage(Component.text(configVar.welcomeMessage, NamedTextColor.GREEN));
+            try {
+                connectToServer.get().ping().get();
+                event.setInitialServer(connectToServer.get());
+                player.sendMessage(Component.text(configVar.welcomeMessage, NamedTextColor.GREEN));
+            } catch (InterruptedException | ExecutionException e) {
+                event.setInitialServer(null);
+                logger.error("Error pinging login server: " + e.getMessage());
+                logger.error("Make sure the login server is online");
+
+//                player.disconnect(Component.text("Failed to connect to server", NamedTextColor.RED));
+
+            }
+
+
         }
     }
 
