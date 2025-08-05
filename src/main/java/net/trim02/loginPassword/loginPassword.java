@@ -67,6 +67,7 @@ public class loginPassword {
 
         
         try {
+            logger.info("Initializing loginPassword plugin...");
             config.initConfig();
         } catch (IOException e) {
             throw new RuntimeException(e);
