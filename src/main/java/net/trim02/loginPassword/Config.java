@@ -51,6 +51,7 @@ public class Config {
 
     public void initConfig() throws IOException {
         if (Files.notExists(dataDirectory)) {
+            logger.info("Data directory does not exist. Creating it.");
             try {
                 Files.createDirectory(dataDirectory);
             } catch (IOException e) {

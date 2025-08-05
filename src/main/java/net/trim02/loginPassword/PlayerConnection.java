@@ -105,7 +105,7 @@ public class PlayerConnection {
     public void onPlayerKick(KickedFromServerEvent event) {
 
         String serverPlayerKicked = event.getServer().getServerInfo().getName();
-        String kickReason = PlainTextComponentSerializer.plainText().serialize(event.getServerKickReason().orElseThrow());
+        String kickReason = PlainTextComponentSerializer.plainText().serialize(event.getServerKickReason().orElse(Component.text("No reason provided")));
 
 
         if (serverPlayerKicked.equals(configVar.loginServer) && kickReason.equals("Unsupported client version")) {
@@ -113,6 +113,18 @@ public class PlayerConnection {
             logger.error("A player attempted to connect to the login server with version {} and failed. Please check if the login server is updated.", event.getPlayer().getProtocolVersion());
 
         }
+    }
+    // Check if the player was redirected from the login server to another server (the hub server). If so, the player would bypass logging in, so we have to disconnect them
+    @Subscribe
+    public void onPlayerRedirect(KickedFromServerEvent event) {
+        String serverPlayerKicked = event.getServer().getServerInfo().getName();
+
+        if (serverPlayerKicked.equals(configVar.loginServer) && event.getResult().toString().contains("RedirectPlayer")) {
+
+            event.setResult(KickedFromServerEvent.DisconnectPlayer.create(Component.text("There was a problem connecting to the server. Please try again later or contact an admin.", NamedTextColor.RED)));
+            logger.warn("Player {} was redirected to another server, this usually means they were unable to connect to the login server for some reason. Check if the login server is updated or online.", event.getPlayer().getUsername());
+        }
+
     }
 
 }
