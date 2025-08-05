@@ -105,7 +105,7 @@ public class PlayerConnection {
     public void onPlayerKick(KickedFromServerEvent event) {
 
         String serverPlayerKicked = event.getServer().getServerInfo().getName();
-        String kickReason = PlainTextComponentSerializer.plainText().serialize(event.getServerKickReason().orElseThrow());
+        String kickReason = PlainTextComponentSerializer.plainText().serialize(event.getServerKickReason().orElse(Component.text("No reason provided")));
 
 
         if (serverPlayerKicked.equals(configVar.loginServer) && kickReason.equals("Unsupported client version")) {
