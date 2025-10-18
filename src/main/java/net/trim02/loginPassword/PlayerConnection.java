@@ -92,10 +92,13 @@ public class PlayerConnection {
         Player player = event.getPlayer();
         RegisteredServer connectedServer = event.getServer();
 
-        if (connectedServer.getServerInfo().getName().equals(configVar.loginServer) && configVar.loginCommandNegated.equals(true)) {
+        if (connectedServer.getServerInfo().getName().equals(configVar.loginServer) && configVar.loginCommandNegated.equals(true) && !player.hasPermission(configVar.bypassNode)) {
             ScheduledTask task = server.getScheduler().buildTask(plugin, () -> player.disconnect(Component.text(configVar.kickMessage))).delay(configVar.kickTimeout, TimeUnit.SECONDS).schedule();
             hashScheduledPlayerTask.put(player.getUniqueId().hashCode(), String.valueOf(task.toString().hashCode()));
 
+        }
+        if (connectedServer.getServerInfo().getName().equals(configVar.loginServer) && player.hasPermission(configVar.bypassNode)) {
+            player.sendMessage(Component.text("Use /server to transfer yourself to another server", NamedTextColor.YELLOW));
         }
 
     }
