@@ -1,7 +1,7 @@
 package net.trim02.loginPassword;
 
 import com.electronwill.nightconfig.core.ConfigSpec;
-import com.electronwill.nightconfig.core.file.FileConfig;
+import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.velocitypowered.api.proxy.ProxyServer;
 import org.slf4j.Logger;
 import org.spongepowered.configurate.CommentedConfigurationNode;
@@ -85,7 +85,7 @@ public class Config {
 
     }
     public void validateConfig(Path configFile) {
-        FileConfig config = FileConfig.of(configFile);
+        CommentedFileConfig config = CommentedFileConfig.of(configFile);
         config.load();
         defaultSpec.correct(config);
         config.save();
@@ -154,7 +154,7 @@ public class Config {
                 throw new RuntimeException(e);
             }
         }
-        FileConfig config = FileConfig.of(configFile);
+        CommentedFileConfig config = CommentedFileConfig.of(configFile);
         config.load();
         configVar.loginServer = config.get("core.loginServer");
         configVar.hubServer = config.get("core.hubServer");
@@ -193,8 +193,8 @@ public class Config {
         }
         Path configFile = dataDirectory.resolve("config.toml");
 
-        FileConfig templateConfig = FileConfig.of(templateConfigFile);
-        FileConfig config = FileConfig.of(configFile);
+        CommentedFileConfig templateConfig = CommentedFileConfig.of(templateConfigFile);
+        CommentedFileConfig config = CommentedFileConfig.of(configFile);
         templateConfig.load();
         //    System.err.println("Template Config values:");
         //    System.err.println("core.loginServer: " + templateConfig.get("core.loginServer"));
@@ -291,7 +291,7 @@ public class Config {
     public void migrateYamlToToml() {
         Path yamlFile = dataDirectory.resolve("config.yml");
         Path tomlFile = dataDirectory.resolve("config.toml");
-        FileConfig config = FileConfig.of(tomlFile);
+        CommentedFileConfig config = CommentedFileConfig.of(tomlFile);
         config.load();
         final YamlConfigurationLoader loader = YamlConfigurationLoader.builder().path(yamlFile).build();
         final CommentedConfigurationNode node;
@@ -327,7 +327,7 @@ public class Config {
 
     }
     public void setConfigValue(String key, Object value) {
-        FileConfig config = FileConfig.of(dataDirectory.resolve("config.toml"));
+        CommentedFileConfig config = CommentedFileConfig.of(dataDirectory.resolve("config.toml"));
         config.load();
         config.set(key, isConfigCorrect(key, value));
         config.save();
