@@ -40,9 +40,7 @@ public class PlayerConnection {
     public void onPlayerJoin(PlayerChooseInitialServerEvent event) {
         Player player = event.getPlayer();
 
-        if ((configVar.oneTimeLogin && player.hasPermission(configVar.bypassNode)) || !configVar.pluginEnabled) {
-            return;
-        } else {
+        if ((!configVar.oneTimeLogin || !player.hasPermission(configVar.bypassNode)) && configVar.pluginEnabled) {
             Optional<RegisteredServer> connectToServer = server.getServer(configVar.loginServer);
             try {
                 connectToServer.get().ping().get();
