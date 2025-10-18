@@ -17,7 +17,11 @@
 	# Remember to disallow the velocity.command.server permission for all players to prevent them from joining the server without logging in first
 	# the permission node to check if a player has bypass permissions. Must exist either on the user or on a group the user is in
 	bypassNode = "loginpassword.bypass"
-    [core.bypass.methods]
+	# If a player with bypass transfers to the login server, how should they be handled?
+	# Options: auto - automatically transfer them to the hub server
+	#          manual - allow the to use /server to transfer to a different server. If this is used, velocity.command.server must be granted to the bypass players
+	bypasserLoginExitMethod = "auto"
+[core.bypass.methods]
     # method to grant bypass permissions. "user" will grant the bypassNode to the player, "group" will add the player to the bypassGroup. the group must exist in the permissions plugin, and multiple groups can exist with the permission node.
 	bypassMethod = "user"
 	bypassGroup = "default"

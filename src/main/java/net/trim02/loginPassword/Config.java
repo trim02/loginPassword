@@ -50,6 +50,7 @@ public class Config {
         public static String loginCommandNode;
         public static String configVersion;
         public static Boolean pluginEnabled;
+        public static String bypasserLoginExitMethod;
     }
     public ConfigSpec defaultConfig() {
         ConfigSpec spec = new ConfigSpec();
@@ -61,6 +62,7 @@ public class Config {
         spec.define("core.bypass.pluginGrantsBypass", true);
         spec.define("core.bypass.disableLoginCommandOnBypass", true);
         spec.define("core.bypass.bypassNode", "loginpassword.bypass");
+        spec.define("core.bypass.bypasserLoginExitMethod", "auto");
         spec.define("core.bypass.methods.bypassMethod", "user");
         spec.define("core.bypass.methods.bypassGroup", "default");
         spec.define("core.kick.kickMessage", "You were kicked for failing to provide the password after 30 seconds");
@@ -172,6 +174,7 @@ public class Config {
         configVar.loginCommandNode = config.get("misc.loginCommandNode");
         configVar.configVersion = config.get("misc.configVersion");
         configVar.pluginEnabled = config.get("misc.pluginEnabled");
+        configVar.bypasserLoginExitMethod = config.get("core.bypass.bypasserLoginExitMethod");
         config.close();
 
     }
@@ -230,23 +233,6 @@ public class Config {
         //    System.err.println("misc.loginCommandNode: " + config.get("misc.loginCommandNode"));
         //    System.err.println("misc.configVersion: " + config.get("misc.configVersion"));
         //    System.err.println("Build Version: " + BuildConstants.VERSION);
-        templateConfig.set("core.loginServer", config.get("core.loginServer"));
-        templateConfig.set("core.hubServer", config.get("core.hubServer"));
-        templateConfig.set("core.serverPassword", config.get("core.serverPassword"));
-        templateConfig.set("core.oneTimeLogin", config.get("core.oneTimeLogin"));
-        templateConfig.set("core.bypass.pluginGrantsBypass", config.get("core.bypass.pluginGrantsBypass"));
-        templateConfig.set("core.bypass.disableLoginCommandOnBypass", config.get("core.bypass.disableLoginCommandOnBypass"));
-        templateConfig.set("core.bypass.bypassNode", config.get("core.bypass.bypassNode"));
-        templateConfig.set("core.bypass.methods.bypassMethod", config.get("core.bypass.methods.bypassMethod"));
-        templateConfig.set("core.bypass.methods.bypassGroup", config.get("core.bypass.methods.bypassGroup"));
-        templateConfig.set("core.kick.kickMessage", config.get("core.kick.kickMessage"));
-        templateConfig.set("core.kick.kickTimeout", config.get("core.kick.kickTimeout"));
-        templateConfig.set("messages.noPassword", config.get("messages.noPassword"));
-        templateConfig.set("messages.wrongPassword", config.get("messages.wrongPassword"));
-        templateConfig.set("messages.welcomeMessage", config.get("messages.welcomeMessage"));
-        templateConfig.set("misc.loginCommandGrantedToEveryone", config.get("misc.loginCommandGrantedToEveryone"));
-        templateConfig.set("misc.loginCommandNode", config.get("misc.loginCommandNode"));
-        templateConfig.set("misc.pluginEnabled", config.get("misc.pluginEnabled"));
         templateConfig.set("core.loginServer", isConfigCorrect("core.loginServer", config.get("core.loginServer")));
         templateConfig.set("core.hubServer", isConfigCorrect("core.hubServer", config.get("core.hubServer")));
         templateConfig.set("core.serverPassword", isConfigCorrect("core.serverPassword", config.get("core.serverPassword")));
@@ -264,6 +250,7 @@ public class Config {
         templateConfig.set("misc.loginCommandGrantedToEveryone", isConfigCorrect("misc.loginCommandGrantedToEveryone", config.get("misc.loginCommandGrantedToEveryone")));
         templateConfig.set("misc.loginCommandNode", isConfigCorrect("misc.loginCommandNode", config.get("misc.loginCommandNode")));
         templateConfig.set("misc.pluginEnabled", isConfigCorrect("misc.pluginEnabled", config.get("misc.pluginEnabled")));
+        templateConfig.set("core.bypass.bypasserLoginExitMethod", isConfigCorrect("core.bypass.bypasserLoginExitMethod",config.get("core.bypass.bypasserLoginExitMethod")));
 
         //    System.err.println("New Config values:");
         //    System.err.println("core.loginServer: " + templateConfig.get("core.loginServer"));
