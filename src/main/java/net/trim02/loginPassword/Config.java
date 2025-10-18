@@ -1,7 +1,7 @@
 package net.trim02.loginPassword;
 
+import com.electronwill.nightconfig.core.ConfigSpec;
 import com.electronwill.nightconfig.core.file.FileConfig;
-import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 import org.slf4j.Logger;
 import org.spongepowered.configurate.CommentedConfigurationNode;
@@ -18,12 +18,15 @@ public class Config {
     protected final loginPassword plugin;
     protected final Logger logger;
     protected final Path dataDirectory;
+    protected final ConfigSpec defaultSpec;
 
     public Config(loginPassword plugin, ProxyServer server, Logger logger, Path dataDirectory) {
         this.server = server;
         this.plugin = plugin;
         this.logger = logger;
         this.dataDirectory = dataDirectory;
+        this.defaultSpec = defaultConfig();
+        com.electronwill.nightconfig.core.Config.setInsertionOrderPreserved(true);
 
 
     }
@@ -47,6 +50,45 @@ public class Config {
         public static String loginCommandNode;
         public static String configVersion;
         public static Boolean pluginEnabled;
+    }
+    public ConfigSpec defaultConfig() {
+        ConfigSpec spec = new ConfigSpec();
+
+        spec.define("core.loginServer", "login");
+        spec.define("core.hubServer", "hub");
+        spec.define("core.serverPassword", "1234");
+        spec.define("core.oneTimeLogin", false);
+        spec.define("core.bypass.pluginGrantsBypass", true);
+        spec.define("core.bypass.disableLoginCommandOnBypass", true);
+        spec.define("core.bypass.bypassNode", "loginpassword.bypass");
+        spec.define("core.bypass.methods.bypassMethod", "user");
+        spec.define("core.bypass.methods.bypassGroup", "default");
+        spec.define("core.kick.kickMessage", "You were kicked for failing to provide the password after 30 seconds");
+        spec.define("core.kick.kickTimeout", 30);
+        spec.define("messages.noPassword", "Please provide a password. It can be found on Discord");
+        spec.define("messages.wrongPassword", "Wrong Password.");
+        spec.define("messages.welcomeMessage", "Please type /login <password> to log in.");
+        spec.define("misc.loginCommandGrantedToEveryone", true);
+        spec.define("misc.loginCommandNode", "loginpassword.login");
+        spec.define("misc.configVersion", BuildConstants.VERSION);
+        spec.define("misc.pluginEnabled", true);
+
+        return spec;
+
+    }
+
+    public Object isConfigCorrect(String key, Object value) {
+       return defaultSpec.correct(key, value);
+
+
+    }
+    public void validateConfig(Path configFile) {
+        FileConfig config = FileConfig.of(configFile);
+        config.load();
+        defaultSpec.correct(config);
+        config.save();
+        config.close();
+
     }
 
     public void initConfig() throws IOException {
@@ -76,6 +118,7 @@ public class Config {
                 throw new RuntimeException(e);
             }
         }
+        validateConfig(configFile);
         getTomlConfig(configFile);
         // Check if local config file version value is different from plugin version
         if(!configVar.configVersion.equals(BuildConstants.VERSION)){
@@ -204,6 +247,23 @@ public class Config {
         templateConfig.set("misc.loginCommandGrantedToEveryone", config.get("misc.loginCommandGrantedToEveryone"));
         templateConfig.set("misc.loginCommandNode", config.get("misc.loginCommandNode"));
         templateConfig.set("misc.pluginEnabled", config.get("misc.pluginEnabled"));
+        templateConfig.set("core.loginServer", isConfigCorrect("core.loginServer", config.get("core.loginServer")));
+        templateConfig.set("core.hubServer", isConfigCorrect("core.hubServer", config.get("core.hubServer")));
+        templateConfig.set("core.serverPassword", isConfigCorrect("core.serverPassword", config.get("core.serverPassword")));
+        templateConfig.set("core.oneTimeLogin", isConfigCorrect("core.oneTimeLogin", config.get("core.oneTimeLogin")));
+        templateConfig.set("core.bypass.pluginGrantsBypass", isConfigCorrect("core.bypass.pluginGrantsBypass", config.get("core.bypass.pluginGrantsBypass")));
+        templateConfig.set("core.bypass.disableLoginCommandOnBypass", isConfigCorrect("core.bypass.disableLoginCommandOnBypass", config.get("core.bypass.disableLoginCommandOnBypass")));
+        templateConfig.set("core.bypass.bypassNode", isConfigCorrect("core.bypass.bypassNode", config.get("core.bypass.bypassNode")));
+        templateConfig.set("core.bypass.methods.bypassMethod", isConfigCorrect("core.bypass.methods.bypassMethod", config.get("core.bypass.methods.bypassMethod")));
+        templateConfig.set("core.bypass.methods.bypassGroup", isConfigCorrect("core.bypass.methods.bypassGroup", config.get("core.bypass.methods.bypassGroup")));
+        templateConfig.set("core.kick.kickMessage", isConfigCorrect("core.kick.kickMessage", config.get("core.kick.kickMessage")));
+        templateConfig.set("core.kick.kickTimeout", isConfigCorrect("core.kick.kickTimeout", config.get("core.kick.kickTimeout")));
+        templateConfig.set("messages.noPassword", isConfigCorrect("messages.noPassword", config.get("messages.noPassword")));
+        templateConfig.set("messages.wrongPassword", isConfigCorrect("messages.wrongPassword", config.get("messages.wrongPassword")));
+        templateConfig.set("messages.welcomeMessage", isConfigCorrect("messages.welcomeMessage", config.get("messages.welcomeMessage")));
+        templateConfig.set("misc.loginCommandGrantedToEveryone", isConfigCorrect("misc.loginCommandGrantedToEveryone", config.get("misc.loginCommandGrantedToEveryone")));
+        templateConfig.set("misc.loginCommandNode", isConfigCorrect("misc.loginCommandNode", config.get("misc.loginCommandNode")));
+        templateConfig.set("misc.pluginEnabled", isConfigCorrect("misc.pluginEnabled", config.get("misc.pluginEnabled")));
 
         //    System.err.println("New Config values:");
         //    System.err.println("core.loginServer: " + templateConfig.get("core.loginServer"));
@@ -282,7 +342,7 @@ public class Config {
     public void setConfigValue(String key, Object value) {
         FileConfig config = FileConfig.of(dataDirectory.resolve("config.toml"));
         config.load();
-        config.set(key, value);
+        config.set(key, isConfigCorrect(key, value));
         config.save();
         config.close();
         try {

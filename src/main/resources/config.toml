@@ -30,7 +30,7 @@
 [messages]
 	# Messages to be sent to player when they do not provide or gives a wrong password
     wrongPassword = "Wrong Password."
-	noPassword = "Please provide a password. It can be found on Discord"
+	noPassword = "Please provide the password. It can be found on Discord"
 	welcomeMessage = "Please type /login <password> to log in."
 
 
