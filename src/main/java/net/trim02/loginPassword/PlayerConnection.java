@@ -4,6 +4,7 @@ import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.player.KickedFromServerEvent;
 import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent;
 import com.velocitypowered.api.event.player.ServerConnectedEvent;
+import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
@@ -55,6 +56,32 @@ public class PlayerConnection {
 
             }
 
+        }
+    }
+
+
+    @Subscribe
+    public void onBypassPlayerConnectToLoginServer(ServerPreConnectEvent event) {
+        Player player = event.getPlayer();
+        boolean isLoginServer = event.getResult().getServer().get().getServerInfo().getName().equals(configVar.loginServer);
+
+        if (isLoginServer && player.hasPermission(configVar.bypassNode) && configVar.bypasserLoginExitMethod.equals("auto")) {
+            Optional<RegisteredServer> connectToServer = server.getServer(configVar.hubServer);
+            try {
+                event.setResult(ServerPreConnectEvent.ServerResult.denied());
+                player.sendMessage(Component.text("Unable to connect to login server, transferring you to the hub server...", NamedTextColor.GREEN));
+                connectToServer.get().ping().get();
+                player.createConnectionRequest(connectToServer.get()).connectWithIndication();
+
+            } catch (InterruptedException | ExecutionException e) {
+                player.sendMessage(Component.text("Error connecting to hub server. Please try reconnecting later or contact an admin.", NamedTextColor.RED));
+                logger.error("Error pinging hub server: {}", e.getMessage());
+                logger.error("Make sure the hub server is online");
+
+            }
+        } else if (isLoginServer && player.hasPermission(configVar.bypassNode) && configVar.bypasserLoginExitMethod.equals("deny-entry")) {
+            event.setResult(ServerPreConnectEvent.ServerResult.denied());
+            player.sendMessage(Component.text("Cannot connect to the login server, try connecting to a different server", NamedTextColor.RED));
 
         }
     }
