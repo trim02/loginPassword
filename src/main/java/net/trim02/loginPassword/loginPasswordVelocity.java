@@ -27,17 +27,19 @@ import net.trim02.loginPassword.Config.configVar;
         })
 public class loginPassword {
 
+public class loginPasswordVelocity implements loginPassword<ProxyServer> {
     private final ProxyServer server;
     private final Logger logger;
     private final Path dataDirectory;
     private final Config config;
 
     @Inject
-    public loginPassword(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
+    public loginPasswordVelocity(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
         this.server = server;
         this.logger = logger;
         this.dataDirectory = dataDirectory;
         this.config = new Config(this, server, logger, dataDirectory);
+        this.config = new Config(logger, dataDirectory);
 
     }
 
@@ -106,5 +108,22 @@ public class loginPassword {
             throw new RuntimeException(e);
         }
         logger.info("Config reloaded!");
+    }
+
+
+
+    @Override
+    public String getPlatformName() {
+        return "Velocity";
+    }
+
+    @Override
+    public Logger getInterLogger() {
+        return this.logger;
+    }
+
+    @Override
+    public ProxyServer getInterServer() {
+        return this.server;
     }
 }

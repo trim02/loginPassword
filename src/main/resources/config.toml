@@ -1,7 +1,8 @@
+# Settings that are only applicable to one platform will be marked with either [Velocity Only] or [Paper Only]
 [core]
-	# The server name set in Velocity that is used for logging in
+	# The server name set in Velocity that is used for logging in. [Velocity Only]
 	loginServer = "login"
-	# The server name set in Velocity that the player will be transferred to after logging in
+	# The server name set in Velocity that the player will be transferred to after logging in. [Velocity Only]
 	hubServer = "hub"
 	# The password players must input to log in
 	serverPassword = "1234"
@@ -35,7 +36,7 @@
 
 
 [misc]
-	configVersion = "1.6"
+	configVersion = "2.0-SNAPSHOT"
 	pluginEnabled = true
 	# set to false to make the login command only accessible to players with the permission node loginpassword.login.
 	# this could be used to have a private server where only some players have access to. oneTimeLogin must be disabled otherwise players with the bypass permissions will always be sent to the private server.

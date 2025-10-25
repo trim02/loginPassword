@@ -23,11 +23,12 @@ import java.util.concurrent.TimeUnit;
 
 public class PlayerConnection {
     private final ProxyServer server;
-    private final loginPassword plugin;
+    private final loginPasswordVelocity plugin;
     private final Logger logger;
     static HashMap<Integer, String> hashScheduledPlayerTask = new HashMap<>();
 
-    public PlayerConnection(ProxyServer server, loginPassword plugin, Logger logger) {
+
+    public PlayerConnection(ProxyServer server, loginPasswordVelocity plugin, Logger logger) {
         this.server = server;
         this.plugin = plugin;
         this.logger = logger;
