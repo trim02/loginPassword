@@ -199,6 +199,7 @@ public class AdminCommand implements BasicCommand {
 
     @Override
     public boolean canUse(CommandSender sender) {
-        return BasicCommand.super.canUse(sender);
+
+        return sender.hasPermission("loginpassword.admin");
     }
 }

@@ -6,3 +6,8 @@ author: trim02
 soft-depend:
   - LuckPerms
   - ViaVersion
+commands:
+    loginpassword:
+        description: Main command for loginPassword plugin
+        usage: /loginpassword <subcommand>
+        permission: loginpassword.admin
