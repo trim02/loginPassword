@@ -26,6 +26,11 @@ repositories {
         name = "bluecoloredReleases"
         url = uri("https://repo.bluecolored.de/releases")
     }
+    maven {
+        name = "viaversion-repo"
+        url = uri("https://repo.viaversion.com")
+    }
+
 }
 
 dependencies {
@@ -34,6 +39,7 @@ dependencies {
     implementation("com.technicjelle:UpdateChecker:2.5.1")
     implementation("com.electronwill.night-config:toml:3.6.0")
     compileOnly("io.papermc.paper:paper-api:1.21.8-R0.1-SNAPSHOT")
+    compileOnly("com.viaversion:viaversion-api:5.5.1")
 
 }
 
@@ -67,6 +73,11 @@ tasks {
         // Your plugin's jar (or shadowJar if present) will be used automatically.
         minecraftVersion("1.21.8")
         runDirectory = file("${project.rootDir}/run/paper")
+        downloadPlugins {
+            url("https://download.luckperms.net/1606/bukkit/loader/LuckPerms-Bukkit-5.5.17.jar")
+            modrinth("ViaBackwards", "9FX5j3OU")
+            modrinth("ViaVersion","b7fitAW8")
+        }
     }
 }
 
