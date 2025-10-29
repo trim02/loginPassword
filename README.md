@@ -65,7 +65,7 @@ The plugin uses a TOML configuration file (`config.toml`) to manage its settings
 
 ### Paper
 1. Download the plugin JAR file.
-2. Place the JAR file in the `plugins` directory of your Velocity server.
+2. Place the JAR file in the `plugins` directory of your paper server.
 3. Start the server to generate the default configuration file.
 4. Edit the `config.toml` file in the `plugins/LoginPassword` directory to suit your needs.
 
