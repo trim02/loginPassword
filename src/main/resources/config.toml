@@ -12,12 +12,17 @@
 	# if set to true, the plugin will grant bypass permission to players. Requires LuckPerms. If you don't use LuckPerms, you must set the bypass permissions manually
 	pluginGrantsBypass = true
     # Set to false to allow the login command to be used by players with bypass permission
-	disableLoginCommandOnBypass = true  
+	disableLoginCommandOnBypass = true
 
 	# Remember to disallow the velocity.command.server permission for all players to prevent them from joining the server without logging in first
 	# the permission node to check if a player has bypass permissions. Must exist either on the user or on a group the user is in
 	bypassNode = "loginpassword.bypass"
-    [core.bypass.methods]
+	# If a player with bypass transfers to the login server, how should they be handled?
+	# Options: auto - automatically transfer them to the hub server
+	#          manual - allow them to use /server to transfer to a different server. If this is used, velocity.command.server must be granted to the bypass players
+	#          deny-entry - prevent them from joining the login server
+	bypasserLoginExitMethod = "auto"
+[core.bypass.methods]
     # method to grant bypass permissions. "user" will grant the bypassNode to the player, "group" will add the player to the bypassGroup. the group must exist in the permissions plugin, and multiple groups can exist with the permission node.
 	bypassMethod = "user"
 	bypassGroup = "default"
@@ -35,7 +40,7 @@
 
 
 [misc]
-	configVersion = "1.6"
+	configVersion = "1.7-SNAPSHOT"
 	pluginEnabled = true
 	# set to false to make the login command only accessible to players with the permission node loginpassword.login.
 	# this could be used to have a private server where only some players have access to. oneTimeLogin must be disabled otherwise players with the bypass permissions will always be sent to the private server.

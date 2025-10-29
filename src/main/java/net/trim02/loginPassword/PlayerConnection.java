@@ -4,6 +4,7 @@ import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.player.KickedFromServerEvent;
 import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent;
 import com.velocitypowered.api.event.player.ServerConnectedEvent;
+import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
@@ -55,6 +56,32 @@ public class PlayerConnection {
 
             }
 
+        }
+    }
+
+
+    @Subscribe
+    public void onBypassPlayerConnectToLoginServer(ServerPreConnectEvent event) {
+        Player player = event.getPlayer();
+        boolean isLoginServer = event.getResult().getServer().get().getServerInfo().getName().equals(configVar.loginServer);
+
+        if (isLoginServer && player.hasPermission(configVar.bypassNode) && configVar.bypasserLoginExitMethod.equals("auto")) {
+            Optional<RegisteredServer> connectToServer = server.getServer(configVar.hubServer);
+            try {
+                event.setResult(ServerPreConnectEvent.ServerResult.denied());
+                player.sendMessage(Component.text("Unable to connect to login server, transferring you to the hub server...", NamedTextColor.GREEN));
+                connectToServer.get().ping().get();
+                player.createConnectionRequest(connectToServer.get()).connectWithIndication();
+
+            } catch (InterruptedException | ExecutionException e) {
+                player.sendMessage(Component.text("Error connecting to hub server. Please try reconnecting later or contact an admin.", NamedTextColor.RED));
+                logger.error("Error pinging hub server: {}", e.getMessage());
+                logger.error("Make sure the hub server is online");
+
+            }
+        } else if (isLoginServer && player.hasPermission(configVar.bypassNode) && configVar.bypasserLoginExitMethod.equals("deny-entry")) {
+            event.setResult(ServerPreConnectEvent.ServerResult.denied());
+            player.sendMessage(Component.text("Cannot connect to the login server, try connecting to a different server", NamedTextColor.RED));
 
         }
     }
@@ -65,10 +92,13 @@ public class PlayerConnection {
         Player player = event.getPlayer();
         RegisteredServer connectedServer = event.getServer();
 
-        if (connectedServer.getServerInfo().getName().equals(configVar.loginServer) && configVar.loginCommandNegated.equals(true)) {
+        if (connectedServer.getServerInfo().getName().equals(configVar.loginServer) && configVar.loginCommandNegated.equals(true) && !player.hasPermission(configVar.bypassNode)) {
             ScheduledTask task = server.getScheduler().buildTask(plugin, () -> player.disconnect(Component.text(configVar.kickMessage))).delay(configVar.kickTimeout, TimeUnit.SECONDS).schedule();
             hashScheduledPlayerTask.put(player.getUniqueId().hashCode(), String.valueOf(task.toString().hashCode()));
 
+        }
+        if (connectedServer.getServerInfo().getName().equals(configVar.loginServer) && player.hasPermission(configVar.bypassNode)) {
+            player.sendMessage(Component.text("Use /server to transfer yourself to another server", NamedTextColor.YELLOW));
         }
 
     }
