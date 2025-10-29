@@ -1,4 +1,4 @@
-package net.trim02.loginPassword;
+package net.trim02.loginPassword.velocity;
 
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;

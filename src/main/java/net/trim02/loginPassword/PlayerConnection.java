@@ -13,6 +13,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.trim02.loginPassword.Config.configVar;
+import net.trim02.loginPassword.common.BypassList;
 import org.slf4j.Logger;
 
 import java.util.Collection;
@@ -24,11 +25,12 @@ import java.util.concurrent.TimeUnit;
 
 public class PlayerConnection {
     private final ProxyServer server;
-    private final loginPassword plugin;
+    private final loginPasswordVelocity plugin;
     private final Logger logger;
     static HashMap<Integer, String> hashScheduledPlayerTask = new HashMap<>();
 
-    public PlayerConnection(ProxyServer server, loginPassword plugin, Logger logger) {
+
+    public PlayerConnection(ProxyServer server, loginPasswordVelocity plugin, Logger logger) {
         this.server = server;
         this.plugin = plugin;
         this.logger = logger;
@@ -41,7 +43,7 @@ public class PlayerConnection {
     public void onPlayerJoin(PlayerChooseInitialServerEvent event) {
         Player player = event.getPlayer();
 
-        if ((!configVar.oneTimeLogin || !player.hasPermission(configVar.bypassNode)) && configVar.pluginEnabled) {
+        if ((!configVar.oneTimeLogin || !(player.hasPermission(configVar.bypassNode) || BypassList.inBypassList(player.getUniqueId())) ) && configVar.pluginEnabled) {
             Optional<RegisteredServer> connectToServer = server.getServer(configVar.loginServer);
             try {
                 connectToServer.get().ping().get();

@@ -2,7 +2,6 @@ package net.trim02.loginPassword;
 
 import com.electronwill.nightconfig.core.ConfigSpec;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
-import com.velocitypowered.api.proxy.ProxyServer;
 import org.slf4j.Logger;
 import org.spongepowered.configurate.CommentedConfigurationNode;
 import org.spongepowered.configurate.ConfigurateException;
@@ -14,15 +13,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class Config {
-    protected final ProxyServer server;
-    protected final loginPassword plugin;
     protected final Logger logger;
     protected final Path dataDirectory;
     protected final ConfigSpec defaultSpec;
 
-    public Config(loginPassword plugin, ProxyServer server, Logger logger, Path dataDirectory) {
-        this.server = server;
-        this.plugin = plugin;
+    public Config(Logger logger, Path dataDirectory) {
         this.logger = logger;
         this.dataDirectory = dataDirectory;
         this.defaultSpec = defaultConfig();
@@ -31,7 +26,7 @@ public class Config {
 
     }
 
-    static class configVar {
+    public static class configVar {
         public static String loginServer;
         public static String hubServer;
         public static String serverPassword;

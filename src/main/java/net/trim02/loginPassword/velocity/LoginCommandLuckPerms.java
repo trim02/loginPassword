@@ -1,21 +1,19 @@
-package net.trim02.loginPassword;
+package net.trim02.loginPassword.velocity;
 
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.ConsoleCommandSource;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
-
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.node.Node;
 import net.trim02.loginPassword.Config.configVar;
+import org.slf4j.Logger;
 
 import java.util.Optional;
-
-import org.slf4j.Logger;
 
 public class LoginCommandLuckPerms extends LoginCommand {
     public static LuckPerms lpApi = LuckPermsProvider.get();
