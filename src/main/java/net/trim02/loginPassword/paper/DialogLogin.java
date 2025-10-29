@@ -1,8 +1,6 @@
 package net.trim02.loginPassword.paper;
 
 import com.destroystokyo.paper.event.player.PlayerConnectionCloseEvent;
-import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.ViaAPI;
 import io.papermc.paper.connection.PlayerConfigurationConnection;
 import io.papermc.paper.dialog.Dialog;
 import io.papermc.paper.dialog.DialogResponseView;
@@ -13,11 +11,10 @@ import io.papermc.paper.registry.RegistryKey;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
-import net.luckperms.api.LuckPerms;
-import net.luckperms.api.LuckPermsProvider;
-import net.luckperms.api.node.Node;
 import net.trim02.loginPassword.Config.configVar;
 import net.trim02.loginPassword.common.BypassList;
+import net.trim02.loginPassword.common.LuckPermsHook;
+import net.trim02.loginPassword.common.ViaVersionHook;
 import net.trim02.loginPassword.loginPasswordPaper;
 import org.bukkit.Server;
 import org.bukkit.event.EventHandler;
@@ -33,8 +30,8 @@ import java.util.concurrent.TimeUnit;
 import static net.trim02.loginPassword.BuildConstants.DIALOG_NAMESPACE;
 
 public class DialogLogin implements Listener {
-    private static ViaAPI viaAPI;
-    private static LuckPerms lpApi;
+    private static boolean isViaLoaded;
+    private static boolean isLuckPermsLoaded;
     private final Logger logger;
     private final Map<UUID, CompletableFuture<Boolean>> connectingPlayers = new ConcurrentHashMap<>();
     private loginPasswordPaper plugin;
@@ -45,16 +42,8 @@ public class DialogLogin implements Listener {
         this.server = server;
         this.logger = logger;
 
-        if (server.getPluginManager().getPlugin("LuckPerms") != null) {
-            lpApi = LuckPermsProvider.get();
-        } else {
-            lpApi = null;
-        }
-        if (server.getPluginManager().getPlugin("ViaVersion") != null) {
-            viaAPI = Via.getAPI();
-        } else {
-            viaAPI = null;
-        }
+        isLuckPermsLoaded = server.getPluginManager().getPlugin("LuckPerms") != null;
+        isViaLoaded = server.getPluginManager().getPlugin("ViaVersion") != null;
     }
 
 
@@ -85,9 +74,10 @@ public class DialogLogin implements Listener {
             return;
         }
         if (configVar.oneTimeLogin) {
-            if (lpApi != null) {
-                var user = lpApi.getUserManager().getUser(playerUUID);
-                if (user != null && user.getCachedData().getPermissionData().checkPermission(configVar.bypassNode).asBoolean()) {
+            if (isLuckPermsLoaded) {
+                var user = LuckPermsHook.api.getUserManager().getUser(playerUUID);
+                assert user != null;
+                if (user.getCachedData().getPermissionData().checkPermission(configVar.bypassNode).asBoolean()) {
 
                     return;
                 }
@@ -98,9 +88,9 @@ public class DialogLogin implements Listener {
             }
         }
 
-        if (viaAPI != null) {
-            if (viaAPI.getPlayerVersion(playerUUID) < 771) {
-                logger.info("Player {} attempted to join using version: {}, which does not support the dialog api required to show the login prompt. They have been disconnected. They must update or be granted bypass permissions using LuckPerms or added to the bypass list using /loginpassword add {}", connection.getProfile().getName(), viaAPI.getPlayerProtocolVersion(playerUUID), playerUUID);
+        if (isViaLoaded) {
+            if (ViaVersionHook.api.getPlayerVersion(playerUUID) < 771) {
+                logger.info("Player {} attempted to join using version: {}, which does not support the dialog api required to show the login prompt. They have been disconnected. They must update or be granted bypass permissions using LuckPerms or added to the bypass list using /loginpassword add {}", connection.getProfile().getName(), ViaVersionHook.api.getPlayerProtocolVersion(playerUUID), playerUUID);
                 connection.disconnect(Component.text("Unsupported Minecraft version. Please use 1.21.6 or higher."));
                 return;
             }
@@ -119,15 +109,12 @@ public class DialogLogin implements Listener {
             logger.info("Player {} failed to log in", connection.getProfile().getName());
         }
         if (response.isDone() && response.join() && (configVar.oneTimeLogin && configVar.pluginGrantsBypass)) {
-            if (lpApi != null) {
+            if (isLuckPermsLoaded) {
                 if (configVar.bypassMethod.equalsIgnoreCase("user")) {
-                    lpApi.getUserManager().modifyUser(playerUUID, user -> {
-                        user.data().add(Node.builder(configVar.bypassNode).build());
-                    });
+                    LuckPermsHook.addNode(playerUUID, configVar.bypassNode);
+
                 } else if (configVar.bypassMethod.equalsIgnoreCase("group")) {
-                    lpApi.getUserManager().modifyUser(playerUUID, user -> {
-                        user.data().add(Node.builder("group." + configVar.bypassGroup).build());
-                    });
+                    LuckPermsHook.addNode(playerUUID, "group." + configVar.bypassGroup);
                 } else {
                     logger.error("An error occurred while granting the user {} bypass permission.", connection.getProfile().getName());
                 }
