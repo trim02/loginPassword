@@ -16,6 +16,9 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import net.trim02.loginPassword.Config.configVar;
 import net.trim02.loginPassword.common.BypassList;
 import net.trim02.loginPassword.interfaces.loginPassword;
+import net.trim02.loginPassword.velocity.AdminCommand;
+import net.trim02.loginPassword.velocity.LoginCommand;
+import net.trim02.loginPassword.velocity.LoginCommandLuckPerms;
 import org.slf4j.Logger;
 
 import java.io.IOException;
