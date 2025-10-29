@@ -22,8 +22,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
 
-import net.trim02.loginPassword.Config.configVar;
-
 @Plugin(id = "loginpassword", name = "loginPassword", version = BuildConstants.VERSION, authors = {
         "trim02" }, dependencies = {
                 @Dependency(id = "luckperms", optional = true)
@@ -84,7 +82,7 @@ public class loginPasswordVelocity implements loginPassword<ProxyServer> {
         server.getEventManager().register(this, new PlayerConnection(server, this, logger));
         CommandManager commandManager = server.getCommandManager();
         CommandMeta commandMetaLogin = commandManager.metaBuilder("login").plugin(this).build();
-        CommandMeta commandMetaAdmin = commandManager.metaBuilder("loginpassword").plugin(this).build();
+        CommandMeta commandMetaAdmin = commandManager.metaBuilder("loginpasswordvelocity").plugin(this).build();
 
         if (server.getPluginManager().isLoaded("luckperms")) {
             logger.debug("luckperms found!");
@@ -98,7 +96,7 @@ public class loginPasswordVelocity implements loginPassword<ProxyServer> {
             commandManager.register(commandMetaLogin, loginCommand);
 
         }
-        SimpleCommand adminCommand = new AdminCommand(server, logger, config);
+        SimpleCommand adminCommand = new AdminCommand(this, server, logger, config);
         commandManager.register(commandMetaAdmin, adminCommand);
         logger.info("Plugin ready!");
     }

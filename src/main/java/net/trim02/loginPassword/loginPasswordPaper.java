@@ -4,6 +4,7 @@ import com.technicjelle.UpdateChecker;
 import io.papermc.paper.command.brigadier.BasicCommand;
 import net.trim02.loginPassword.common.BypassList;
 import net.trim02.loginPassword.interfaces.loginPassword;
+import net.trim02.loginPassword.paper.AdminCommand;
 import net.trim02.loginPassword.paper.DialogLogin;
 import net.trim02.loginPassword.paper.PaperComms;
 import org.bukkit.Server;
@@ -72,6 +73,8 @@ public class loginPasswordPaper extends JavaPlugin implements loginPassword<Serv
             new BypassList(logger, dataDirectory);
             BypassList.loadBypassList();
 
+            BasicCommand adminCommand = new AdminCommand(this, server, logger, config);
+            registerCommand("loginpassword", adminCommand);
 
 
 //            this.getCommand("login").setExecutor(new LoginCommand(this.server, this.logger));
