@@ -12,7 +12,7 @@
 [core.bypass]
 	# if set to true, the plugin will grant bypass permission to players. Requires LuckPerms. If you don't use LuckPerms, you must set the bypass permissions manually
 	pluginGrantsBypass = true
-    # Set to false to allow the login command to be used by players with bypass permission
+    # Set to false to allow the login command to be used by players with bypass permission [Velocity Only]
 	disableLoginCommandOnBypass = true  
 
 	# Remember to disallow the velocity.command.server permission for all players to prevent them from joining the server without logging in first
@@ -32,13 +32,14 @@
 	# Messages to be sent to player when they do not provide or gives a wrong password
     wrongPassword = "Wrong Password."
 	noPassword = "Please provide the password. It can be found on Discord"
-	welcomeMessage = "Please type /login <password> to log in."
+	# Shows as a message if the join the login server [Velocity Only], or shown as a title in the dialog [Paper Only]
+	welcomeMessage = "Please enter the server password to continue."
 
 
 [misc]
 	configVersion = "2.0-SNAPSHOT"
 	pluginEnabled = true
-	# set to false to make the login command only accessible to players with the permission node loginpassword.login.
+	# set to false to make the login command only accessible to players with the permission node loginpassword.login. [Velocity Only]
 	# this could be used to have a private server where only some players have access to. oneTimeLogin must be disabled otherwise players with the bypass permissions will always be sent to the private server.
 	loginCommandGrantedToEveryone = true
 	loginCommandNode = "loginpassword.login"
