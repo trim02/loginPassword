@@ -1,6 +1,8 @@
 package net.trim02.loginPassword;
 
 import com.technicjelle.UpdateChecker;
+import io.papermc.paper.command.brigadier.BasicCommand;
+import net.trim02.loginPassword.common.BypassList;
 import net.trim02.loginPassword.interfaces.loginPassword;
 import net.trim02.loginPassword.paper.DialogLogin;
 import net.trim02.loginPassword.paper.PaperComms;
@@ -67,6 +69,8 @@ public class loginPasswordPaper extends JavaPlugin implements loginPassword<Serv
         }
         try {
             this.getServer().getPluginManager().registerEvents(new DialogLogin(this, server, logger), this);
+            new BypassList(logger, dataDirectory);
+            BypassList.loadBypassList();
 
 
 
@@ -91,6 +95,11 @@ public class loginPasswordPaper extends JavaPlugin implements loginPassword<Serv
     @Override
     public Logger getInterLogger() {
         return this.getComponentLogger();
+    }
+
+    @Override
+    public Path getInterDataFolder() {
+        return dataDirectory;
     }
 
     @Override

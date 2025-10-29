@@ -1,6 +1,5 @@
 package net.trim02.loginPassword.paper;
 
-import com.sun.jdi.Bootstrap;
 import io.papermc.paper.plugin.bootstrap.BootstrapContext;
 import io.papermc.paper.plugin.bootstrap.PluginBootstrap;
 import io.papermc.paper.registry.data.dialog.ActionButton;
@@ -16,7 +15,6 @@ import net.trim02.loginPassword.Config;
 import net.trim02.loginPassword.Config.configVar;
 import org.slf4j.Logger;
 
-import java.awt.*;
 import java.util.List;
 
 import static net.trim02.loginPassword.BuildConstants.DIALOG_NAMESPACE;

@@ -6,13 +6,16 @@ import com.technicjelle.UpdateChecker;
 import com.velocitypowered.api.command.CommandManager;
 import com.velocitypowered.api.command.CommandMeta;
 import com.velocitypowered.api.command.SimpleCommand;
-import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyReloadEvent;
 import com.velocitypowered.api.plugin.Dependency;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
+import net.trim02.loginPassword.Config.configVar;
+import net.trim02.loginPassword.common.BypassList;
+import net.trim02.loginPassword.interfaces.loginPassword;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -38,7 +41,6 @@ public class loginPasswordVelocity implements loginPassword<ProxyServer> {
         this.server = server;
         this.logger = logger;
         this.dataDirectory = dataDirectory;
-        this.config = new Config(this, server, logger, dataDirectory);
         this.config = new Config(logger, dataDirectory);
 
     }
@@ -71,6 +73,7 @@ public class loginPasswordVelocity implements loginPassword<ProxyServer> {
         try {
             logger.info("Initializing loginPassword plugin...");
             config.initConfig();
+            new BypassList(logger, dataDirectory);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -104,6 +107,7 @@ public class loginPasswordVelocity implements loginPassword<ProxyServer> {
     public void onProxyReload(ProxyReloadEvent event) {
         try {
            config.initConfig();
+           BypassList.loadBypassList();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -125,5 +129,10 @@ public class loginPasswordVelocity implements loginPassword<ProxyServer> {
     @Override
     public ProxyServer getInterServer() {
         return this.server;
+    }
+
+    @Override
+    public Path getInterDataFolder() {
+        return dataDirectory;
     }
 }
