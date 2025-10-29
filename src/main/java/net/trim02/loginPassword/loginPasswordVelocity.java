@@ -29,7 +29,6 @@ import java.util.concurrent.TimeUnit;
         "trim02" }, dependencies = {
                 @Dependency(id = "luckperms", optional = true)
         })
-public class loginPassword {
 
 public class loginPasswordVelocity implements loginPassword<ProxyServer> {
     private final ProxyServer server;
@@ -75,6 +74,7 @@ public class loginPasswordVelocity implements loginPassword<ProxyServer> {
             logger.info("Initializing loginPassword plugin...");
             config.initConfig();
             new BypassList(logger, dataDirectory);
+            BypassList.loadBypassList();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

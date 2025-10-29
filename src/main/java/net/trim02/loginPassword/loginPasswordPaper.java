@@ -6,7 +6,6 @@ import net.trim02.loginPassword.common.BypassList;
 import net.trim02.loginPassword.interfaces.loginPassword;
 import net.trim02.loginPassword.paper.AdminCommand;
 import net.trim02.loginPassword.paper.DialogLogin;
-import net.trim02.loginPassword.paper.PaperComms;
 import org.bukkit.Server;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;

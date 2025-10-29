@@ -21,7 +21,7 @@ import java.util.UUID;
 
 
 public class AdminCommand implements SimpleCommand {
-    protected final loginPassword<?, ?> plugin;
+    protected final loginPassword<?> plugin;
     protected final ProxyServer server;
     protected final Logger logger;
     protected final Config config;
