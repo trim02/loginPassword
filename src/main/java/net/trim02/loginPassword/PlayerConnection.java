@@ -4,6 +4,7 @@ import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.player.KickedFromServerEvent;
 import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent;
 import com.velocitypowered.api.event.player.ServerConnectedEvent;
+import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
@@ -12,6 +13,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.trim02.loginPassword.Config.configVar;
+import net.trim02.loginPassword.common.BypassList;
 import org.slf4j.Logger;
 
 import java.util.Collection;
@@ -23,11 +25,12 @@ import java.util.concurrent.TimeUnit;
 
 public class PlayerConnection {
     private final ProxyServer server;
-    private final loginPassword plugin;
+    private final loginPasswordVelocity plugin;
     private final Logger logger;
     static HashMap<Integer, String> hashScheduledPlayerTask = new HashMap<>();
 
-    public PlayerConnection(ProxyServer server, loginPassword plugin, Logger logger) {
+
+    public PlayerConnection(ProxyServer server, loginPasswordVelocity plugin, Logger logger) {
         this.server = server;
         this.plugin = plugin;
         this.logger = logger;
@@ -40,7 +43,7 @@ public class PlayerConnection {
     public void onPlayerJoin(PlayerChooseInitialServerEvent event) {
         Player player = event.getPlayer();
 
-        if ((!configVar.oneTimeLogin || !player.hasPermission(configVar.bypassNode)) && configVar.pluginEnabled) {
+        if ((!configVar.oneTimeLogin || !(player.hasPermission(configVar.bypassNode) || BypassList.inBypassList(player.getUniqueId())) ) && configVar.pluginEnabled) {
             Optional<RegisteredServer> connectToServer = server.getServer(configVar.loginServer);
             try {
                 connectToServer.get().ping().get();
@@ -55,6 +58,32 @@ public class PlayerConnection {
 
             }
 
+        }
+    }
+
+
+    @Subscribe
+    public void onBypassPlayerConnectToLoginServer(ServerPreConnectEvent event) {
+        Player player = event.getPlayer();
+        boolean isLoginServer = event.getResult().getServer().get().getServerInfo().getName().equals(configVar.loginServer);
+
+        if (isLoginServer && player.hasPermission(configVar.bypassNode) && configVar.bypasserLoginExitMethod.equals("auto")) {
+            Optional<RegisteredServer> connectToServer = server.getServer(configVar.hubServer);
+            try {
+                event.setResult(ServerPreConnectEvent.ServerResult.denied());
+                player.sendMessage(Component.text("Unable to connect to login server, transferring you to the hub server...", NamedTextColor.GREEN));
+                connectToServer.get().ping().get();
+                player.createConnectionRequest(connectToServer.get()).connectWithIndication();
+
+            } catch (InterruptedException | ExecutionException e) {
+                player.sendMessage(Component.text("Error connecting to hub server. Please try reconnecting later or contact an admin.", NamedTextColor.RED));
+                logger.error("Error pinging hub server: {}", e.getMessage());
+                logger.error("Make sure the hub server is online");
+
+            }
+        } else if (isLoginServer && player.hasPermission(configVar.bypassNode) && configVar.bypasserLoginExitMethod.equals("deny-entry")) {
+            event.setResult(ServerPreConnectEvent.ServerResult.denied());
+            player.sendMessage(Component.text("Cannot connect to the login server, try connecting to a different server", NamedTextColor.RED));
 
         }
     }
@@ -65,10 +94,13 @@ public class PlayerConnection {
         Player player = event.getPlayer();
         RegisteredServer connectedServer = event.getServer();
 
-        if (connectedServer.getServerInfo().getName().equals(configVar.loginServer) && configVar.loginCommandNegated.equals(true)) {
+        if (connectedServer.getServerInfo().getName().equals(configVar.loginServer) && configVar.loginCommandNegated.equals(true) && !player.hasPermission(configVar.bypassNode)) {
             ScheduledTask task = server.getScheduler().buildTask(plugin, () -> player.disconnect(Component.text(configVar.kickMessage))).delay(configVar.kickTimeout, TimeUnit.SECONDS).schedule();
             hashScheduledPlayerTask.put(player.getUniqueId().hashCode(), String.valueOf(task.toString().hashCode()));
 
+        }
+        if (connectedServer.getServerInfo().getName().equals(configVar.loginServer) && player.hasPermission(configVar.bypassNode)) {
+            player.sendMessage(Component.text("Use /server to transfer yourself to another server", NamedTextColor.YELLOW));
         }
 
     }

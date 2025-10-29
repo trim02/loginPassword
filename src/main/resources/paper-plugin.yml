@@ -1,0 +1,16 @@
+name: loginPassword
+version: 1.0.0
+main: net.trim02.loginPassword.loginPasswordPaper
+bootstrapper: net.trim02.loginPassword.paper.loginPasswordBootstrap
+api-version: '1.21.8'
+author: trim02
+dependencies:
+  server:
+    LuckPerms:
+      load: BEFORE
+      required: false
+      join-classpath: true
+    ViaVersion:
+      load: BEFORE
+      required: false
+      join-classpath: true

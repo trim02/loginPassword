@@ -1,0 +1,13 @@
+name: loginPassword
+version: 1.0.0
+main: net.trim02.loginPassword.loginPasswordPaper
+api-version: '1.21.8'
+author: trim02
+soft-depend:
+  - LuckPerms
+  - ViaVersion
+commands:
+    loginpassword:
+        description: Main command for loginPassword plugin
+        usage: /loginpassword <subcommand>
+        permission: loginpassword.admin

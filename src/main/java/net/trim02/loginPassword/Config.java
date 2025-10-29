@@ -1,8 +1,7 @@
 package net.trim02.loginPassword;
 
 import com.electronwill.nightconfig.core.ConfigSpec;
-import com.electronwill.nightconfig.core.file.FileConfig;
-import com.velocitypowered.api.proxy.ProxyServer;
+import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import org.slf4j.Logger;
 import org.spongepowered.configurate.CommentedConfigurationNode;
 import org.spongepowered.configurate.ConfigurateException;
@@ -14,15 +13,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class Config {
-    protected final ProxyServer server;
-    protected final loginPassword plugin;
     protected final Logger logger;
     protected final Path dataDirectory;
     protected final ConfigSpec defaultSpec;
 
-    public Config(loginPassword plugin, ProxyServer server, Logger logger, Path dataDirectory) {
-        this.server = server;
-        this.plugin = plugin;
+    public Config(Logger logger, Path dataDirectory) {
         this.logger = logger;
         this.dataDirectory = dataDirectory;
         this.defaultSpec = defaultConfig();
@@ -31,7 +26,7 @@ public class Config {
 
     }
 
-    static class configVar {
+    public static class configVar {
         public static String loginServer;
         public static String hubServer;
         public static String serverPassword;
@@ -50,6 +45,7 @@ public class Config {
         public static String loginCommandNode;
         public static String configVersion;
         public static Boolean pluginEnabled;
+        public static String bypasserLoginExitMethod;
     }
     public ConfigSpec defaultConfig() {
         ConfigSpec spec = new ConfigSpec();
@@ -61,6 +57,7 @@ public class Config {
         spec.define("core.bypass.pluginGrantsBypass", true);
         spec.define("core.bypass.disableLoginCommandOnBypass", true);
         spec.define("core.bypass.bypassNode", "loginpassword.bypass");
+        spec.define("core.bypass.bypasserLoginExitMethod", "auto");
         spec.define("core.bypass.methods.bypassMethod", "user");
         spec.define("core.bypass.methods.bypassGroup", "default");
         spec.define("core.kick.kickMessage", "You were kicked for failing to provide the password after 30 seconds");
@@ -83,7 +80,7 @@ public class Config {
 
     }
     public void validateConfig(Path configFile) {
-        FileConfig config = FileConfig.of(configFile);
+        CommentedFileConfig config = CommentedFileConfig.of(configFile);
         config.load();
         defaultSpec.correct(config);
         config.save();
@@ -152,7 +149,7 @@ public class Config {
                 throw new RuntimeException(e);
             }
         }
-        FileConfig config = FileConfig.of(configFile);
+        CommentedFileConfig config = CommentedFileConfig.of(configFile);
         config.load();
         configVar.loginServer = config.get("core.loginServer");
         configVar.hubServer = config.get("core.hubServer");
@@ -172,6 +169,7 @@ public class Config {
         configVar.loginCommandNode = config.get("misc.loginCommandNode");
         configVar.configVersion = config.get("misc.configVersion");
         configVar.pluginEnabled = config.get("misc.pluginEnabled");
+        configVar.bypasserLoginExitMethod = config.get("core.bypass.bypasserLoginExitMethod");
         config.close();
 
     }
@@ -190,8 +188,8 @@ public class Config {
         }
         Path configFile = dataDirectory.resolve("config.toml");
 
-        FileConfig templateConfig = FileConfig.of(templateConfigFile);
-        FileConfig config = FileConfig.of(configFile);
+        CommentedFileConfig templateConfig = CommentedFileConfig.of(templateConfigFile);
+        CommentedFileConfig config = CommentedFileConfig.of(configFile);
         templateConfig.load();
         //    System.err.println("Template Config values:");
         //    System.err.println("core.loginServer: " + templateConfig.get("core.loginServer"));
@@ -230,23 +228,6 @@ public class Config {
         //    System.err.println("misc.loginCommandNode: " + config.get("misc.loginCommandNode"));
         //    System.err.println("misc.configVersion: " + config.get("misc.configVersion"));
         //    System.err.println("Build Version: " + BuildConstants.VERSION);
-        templateConfig.set("core.loginServer", config.get("core.loginServer"));
-        templateConfig.set("core.hubServer", config.get("core.hubServer"));
-        templateConfig.set("core.serverPassword", config.get("core.serverPassword"));
-        templateConfig.set("core.oneTimeLogin", config.get("core.oneTimeLogin"));
-        templateConfig.set("core.bypass.pluginGrantsBypass", config.get("core.bypass.pluginGrantsBypass"));
-        templateConfig.set("core.bypass.disableLoginCommandOnBypass", config.get("core.bypass.disableLoginCommandOnBypass"));
-        templateConfig.set("core.bypass.bypassNode", config.get("core.bypass.bypassNode"));
-        templateConfig.set("core.bypass.methods.bypassMethod", config.get("core.bypass.methods.bypassMethod"));
-        templateConfig.set("core.bypass.methods.bypassGroup", config.get("core.bypass.methods.bypassGroup"));
-        templateConfig.set("core.kick.kickMessage", config.get("core.kick.kickMessage"));
-        templateConfig.set("core.kick.kickTimeout", config.get("core.kick.kickTimeout"));
-        templateConfig.set("messages.noPassword", config.get("messages.noPassword"));
-        templateConfig.set("messages.wrongPassword", config.get("messages.wrongPassword"));
-        templateConfig.set("messages.welcomeMessage", config.get("messages.welcomeMessage"));
-        templateConfig.set("misc.loginCommandGrantedToEveryone", config.get("misc.loginCommandGrantedToEveryone"));
-        templateConfig.set("misc.loginCommandNode", config.get("misc.loginCommandNode"));
-        templateConfig.set("misc.pluginEnabled", config.get("misc.pluginEnabled"));
         templateConfig.set("core.loginServer", isConfigCorrect("core.loginServer", config.get("core.loginServer")));
         templateConfig.set("core.hubServer", isConfigCorrect("core.hubServer", config.get("core.hubServer")));
         templateConfig.set("core.serverPassword", isConfigCorrect("core.serverPassword", config.get("core.serverPassword")));
@@ -264,6 +245,7 @@ public class Config {
         templateConfig.set("misc.loginCommandGrantedToEveryone", isConfigCorrect("misc.loginCommandGrantedToEveryone", config.get("misc.loginCommandGrantedToEveryone")));
         templateConfig.set("misc.loginCommandNode", isConfigCorrect("misc.loginCommandNode", config.get("misc.loginCommandNode")));
         templateConfig.set("misc.pluginEnabled", isConfigCorrect("misc.pluginEnabled", config.get("misc.pluginEnabled")));
+        templateConfig.set("core.bypass.bypasserLoginExitMethod", isConfigCorrect("core.bypass.bypasserLoginExitMethod",config.get("core.bypass.bypasserLoginExitMethod")));
 
         //    System.err.println("New Config values:");
         //    System.err.println("core.loginServer: " + templateConfig.get("core.loginServer"));
@@ -304,7 +286,7 @@ public class Config {
     public void migrateYamlToToml() {
         Path yamlFile = dataDirectory.resolve("config.yml");
         Path tomlFile = dataDirectory.resolve("config.toml");
-        FileConfig config = FileConfig.of(tomlFile);
+        CommentedFileConfig config = CommentedFileConfig.of(tomlFile);
         config.load();
         final YamlConfigurationLoader loader = YamlConfigurationLoader.builder().path(yamlFile).build();
         final CommentedConfigurationNode node;
@@ -340,7 +322,7 @@ public class Config {
 
     }
     public void setConfigValue(String key, Object value) {
-        FileConfig config = FileConfig.of(dataDirectory.resolve("config.toml"));
+        CommentedFileConfig config = CommentedFileConfig.of(dataDirectory.resolve("config.toml"));
         config.load();
         config.set(key, isConfigCorrect(key, value));
         config.save();

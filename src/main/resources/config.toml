@@ -1,7 +1,8 @@
+# Settings that are only applicable to one platform will be marked with either [Velocity Only] or [Paper Only]
 [core]
-	# The server name set in Velocity that is used for logging in
+	# The server name set in Velocity that is used for logging in. [Velocity Only]
 	loginServer = "login"
-	# The server name set in Velocity that the player will be transferred to after logging in
+	# The server name set in Velocity that the player will be transferred to after logging in. [Velocity Only]
 	hubServer = "hub"
 	# The password players must input to log in
 	serverPassword = "1234"
@@ -11,13 +12,18 @@
 [core.bypass]
 	# if set to true, the plugin will grant bypass permission to players. Requires LuckPerms. If you don't use LuckPerms, you must set the bypass permissions manually
 	pluginGrantsBypass = true
-    # Set to false to allow the login command to be used by players with bypass permission
-	disableLoginCommandOnBypass = true  
+    # Set to false to allow the login command to be used by players with bypass permission [Velocity Only]
+	disableLoginCommandOnBypass = true
 
 	# Remember to disallow the velocity.command.server permission for all players to prevent them from joining the server without logging in first
 	# the permission node to check if a player has bypass permissions. Must exist either on the user or on a group the user is in
 	bypassNode = "loginpassword.bypass"
-    [core.bypass.methods]
+	# If a player with bypass transfers to the login server, how should they be handled? [Velocity Only]
+	# Options: auto - automatically transfer them to the hub server
+	#          manual - allow them to use /server to transfer to a different server. If this is used, velocity.command.server must be granted to the bypass players
+	#          deny-entry - prevent them from joining the login server
+	bypasserLoginExitMethod = "auto"
+[core.bypass.methods]
     # method to grant bypass permissions. "user" will grant the bypassNode to the player, "group" will add the player to the bypassGroup. the group must exist in the permissions plugin, and multiple groups can exist with the permission node.
 	bypassMethod = "user"
 	bypassGroup = "default"
@@ -31,13 +37,14 @@
 	# Messages to be sent to player when they do not provide or gives a wrong password
     wrongPassword = "Wrong Password."
 	noPassword = "Please provide the password. It can be found on Discord"
-	welcomeMessage = "Please type /login <password> to log in."
+	# Shows as a message if the join the login server [Velocity Only], or shown as a title in the dialog [Paper Only]
+	welcomeMessage = "Please enter the server password to continue."
 
 
 [misc]
-	configVersion = "1.6"
+	configVersion = "2.0-SNAPSHOT"
 	pluginEnabled = true
-	# set to false to make the login command only accessible to players with the permission node loginpassword.login.
+	# set to false to make the login command only accessible to players with the permission node loginpassword.login. [Velocity Only]
 	# this could be used to have a private server where only some players have access to. oneTimeLogin must be disabled otherwise players with the bypass permissions will always be sent to the private server.
 	loginCommandGrantedToEveryone = true
 	loginCommandNode = "loginpassword.login"
