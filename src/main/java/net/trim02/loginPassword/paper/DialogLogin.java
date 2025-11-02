@@ -79,6 +79,8 @@ public class DialogLogin implements Listener {
                 assert user != null;
                 if (user.getCachedData().getPermissionData().checkPermission(configVar.bypassNode).asBoolean()) {
 
+                if (LuckPermsHook.loadUser(playerUUID).getCachedData().getPermissionData().checkPermission(configVar.bypassNode).asBoolean()) {
+
                     return;
                 }
             }
