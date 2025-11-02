@@ -10,7 +10,7 @@ plugins {
 }
 
 group = 'net.trim02'
-version = '2.0'
+version = property("version")
 
 repositories {
     mavenCentral()
@@ -95,6 +95,12 @@ def generateTemplates = tasks.register('generateTemplates', Copy) { task ->
     task.from templateSource
     task.into templateDest
     task.expand props
+}
+
+
+processResources {
+    expand(project.properties)
+
 }
 
 sourceSets.main.java.srcDir(generateTemplates.map { it.outputs })

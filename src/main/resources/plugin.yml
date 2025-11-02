@@ -1,7 +1,7 @@
 name: loginPassword
-version: 2.0
+version: ${version}
 main: net.trim02.loginPassword.loginPasswordPaper
-api-version: '1.21.8'
+api-version: '${apiVersion}'
 author: trim02
 soft-depend:
   - LuckPerms
