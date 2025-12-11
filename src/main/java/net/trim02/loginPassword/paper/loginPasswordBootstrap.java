@@ -11,6 +11,7 @@ import io.papermc.paper.registry.event.RegistryEvents;
 import io.papermc.paper.registry.keys.DialogKeys;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.trim02.loginPassword.Config;
 import net.trim02.loginPassword.Config.configVar;
 import org.slf4j.Logger;
@@ -49,7 +50,10 @@ public class loginPasswordBootstrap implements PluginBootstrap {
                 event -> event.registry().register(
                         DialogKeys.create(Key.key(DIALOG_NAMESPACE, "login_dialog")),
                         builder -> builder.base(
-                                DialogBase.builder(Component.text(configVar.welcomeMessage)).canCloseWithEscape(false).inputs(
+                                DialogBase.builder(
+//                                        Component.text(configVar.welcomeMessage)
+                                        MiniMessage.miniMessage().deserialize(configVar.welcomeMessage)
+                                ).canCloseWithEscape(false).inputs(
                                         List.of(
                                                 DialogInput.text("password_input", Component.text("password")).build()
                                         )
