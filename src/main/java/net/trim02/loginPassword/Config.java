@@ -85,8 +85,8 @@ public class Config {
         CommentedFileConfig config = CommentedFileConfig.of(configFile);
         config.load();
         if (config.get("misc.configVersion") instanceof String) {
-            config.set("misc.configVersion", 6);
-            logger.warn("Config version was a string. Set to 6 for migration.");
+            config.set("misc.configVersion", 7);
+            logger.warn("Config version was a string. Set to 7 for migration.");
             config.save();
             config.close();
             return true;
