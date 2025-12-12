@@ -67,7 +67,6 @@ public class DialogLogin implements Listener {
         UUID playerUUID = connection.getProfile().getId();
 
 
-
         if (playerUUID == null) {
             event.getConnection().disconnect(Component.text("Internal server error"));
             logger.error("Player {} UUID is null", connection.getProfile().getName());
@@ -75,12 +74,7 @@ public class DialogLogin implements Listener {
         }
         if (configVar.oneTimeLogin) {
             if (isLuckPermsLoaded) {
-                var user = LuckPermsHook.api.getUserManager().getUser(playerUUID);
-                assert user != null;
-                if (user.getCachedData().getPermissionData().checkPermission(configVar.bypassNode).asBoolean()) {
-
                 if (LuckPermsHook.loadUser(playerUUID).getCachedData().getPermissionData().checkPermission(configVar.bypassNode).asBoolean()) {
-
                     return;
                 }
             }
@@ -105,27 +99,27 @@ public class DialogLogin implements Listener {
         audience.showDialog(dialog);
 
 
-            if (!response.join()) {
-                audience.closeDialog();
-                connection.disconnect(Component.text("Login failure"));
-                logger.info("Player {} failed to log in", connection.getProfile().getName());
-            }
-            if (response.isDone() && response.join() && (configVar.oneTimeLogin && configVar.pluginGrantsBypass)) {
-                if (isLuckPermsLoaded) {
-                    if (configVar.bypassMethod.equalsIgnoreCase("user")) {
-                        LuckPermsHook.addNode(playerUUID, configVar.bypassNode);
+        if (!response.join()) {
+            audience.closeDialog();
+            connection.disconnect(Component.text("Login failure"));
+            logger.info("Player {} failed to log in", connection.getProfile().getName());
+        }
+        if (response.isDone() && response.join() && (configVar.oneTimeLogin && configVar.pluginGrantsBypass)) {
+            if (isLuckPermsLoaded) {
+                if (configVar.bypassMethod.equalsIgnoreCase("user")) {
+                    LuckPermsHook.addNode(playerUUID, configVar.bypassNode);
 
-                    } else if (configVar.bypassMethod.equalsIgnoreCase("group")) {
-                        LuckPermsHook.addNode(playerUUID, "group." + configVar.bypassGroup);
-                    } else {
-                        logger.error("An error occurred while granting the user {} bypass permission.", connection.getProfile().getName());
-                    }
+                } else if (configVar.bypassMethod.equalsIgnoreCase("group")) {
+                    LuckPermsHook.addNode(playerUUID, "group." + configVar.bypassGroup);
                 } else {
-                    BypassList.addBypassEntry(String.valueOf(playerUUID));
+                    logger.error("An error occurred while granting the user {} bypass permission.", connection.getProfile().getName());
                 }
-                logger.info("Player {} successfully logged in", connection.getProfile().getName());
+            } else {
+                BypassList.addBypassEntry(String.valueOf(playerUUID));
             }
-            connectingPlayers.remove(playerUUID);
+            logger.info("Player {} successfully logged in", connection.getProfile().getName());
+        }
+        connectingPlayers.remove(playerUUID);
 
 
     }
