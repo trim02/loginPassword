@@ -171,14 +171,20 @@ public class DialogLogin implements Listener {
             configurationConnection.disconnect(Component.text(configVar.noPassword));
             setConnectionResult(playerUUID, false);
             return;
-        }
-        if (passwordInput.equals(configVar.serverPassword)) {
-            setConnectionResult(playerUUID, true);
         } else {
-            configurationConnection.getAudience().closeDialog();
-            configurationConnection.disconnect(Component.text(configVar.wrongPassword));
-            setConnectionResult(playerUUID, false);
+            for (String password : configVar.serverPassword) {
+                if (passwordInput.equals(password)) {
+//                    configurationConnection.getAudience().closeDialog();
+                    setConnectionResult(playerUUID, true);
+                    return;
+                }
+            }
+            setConnectionResult(playerUUID, true);
         }
+        configurationConnection.disconnect(Component.text(configVar.wrongPassword));
+        configurationConnection.getAudience().closeDialog();
+        setConnectionResult(playerUUID, false);
+
 
     }
 
