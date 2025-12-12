@@ -34,15 +34,26 @@ public class LoginCommand implements SimpleCommand {
             source.sendMessage(Component.text(configVar.noPassword, NamedTextColor.RED));
             return;
         }
-        if (source instanceof Player player && args[0].equals(configVar.serverPassword)) {
-            Optional<RegisteredServer> connectToServer = server.getServer(configVar.hubServer);
-            player.createConnectionRequest(connectToServer.get()).connectWithIndication();
+        if (source instanceof Player player && !args[0].isEmpty()) {
+            for (String password : configVar.serverPassword) {
+                if (args[0].equals(password)) {
+                    Optional<RegisteredServer> connectToServer = server.getServer(configVar.hubServer);
+                    player.createConnectionRequest(connectToServer.get()).connectWithIndication();
+                    return;
+                } else {
+                    source.sendMessage(Component.text(configVar.wrongPassword, NamedTextColor.RED));
+                }
+            }
+//            Optional<RegisteredServer> connectToServer = server.getServer(configVar.hubServer);
+//            player.createConnectionRequest(connectToServer.get()).connectWithIndication();
 
             // logger.info("Player {} has logged in", player.getUsername());
 
-        } else if (!args[0].equals(configVar.serverPassword)) {
-            source.sendMessage(Component.text(configVar.wrongPassword, NamedTextColor.RED));
-        } else if (source instanceof ConsoleCommandSource) {
+        }
+//        else if (!args[0].equals(configVar.serverPassword)) {
+//            source.sendMessage(Component.text(configVar.wrongPassword, NamedTextColor.RED));
+//        }
+        else if (source instanceof ConsoleCommandSource) {
             source.sendMessage(Component.text("This command can only be run by a player", NamedTextColor.RED));
         } else {
             source.sendMessage(
