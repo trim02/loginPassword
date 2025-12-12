@@ -100,7 +100,7 @@ public class DialogLogin implements Listener {
 
 
         if (!response.join()) {
-            audience.closeDialog();
+
             connection.disconnect(Component.text("Login failure"));
             logger.info("Player {} failed to log in", connection.getProfile().getName());
         }
@@ -173,10 +173,9 @@ public class DialogLogin implements Listener {
                     return;
                 }
             }
-            setConnectionResult(playerUUID, true);
         }
-        configurationConnection.disconnect(Component.text(configVar.wrongPassword));
         configurationConnection.getAudience().closeDialog();
+        configurationConnection.disconnect(Component.text(configVar.wrongPassword));
         setConnectionResult(playerUUID, false);
 
 
