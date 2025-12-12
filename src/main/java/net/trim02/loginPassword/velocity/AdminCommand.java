@@ -45,14 +45,14 @@ public class AdminCommand implements SimpleCommand {
             // /loginpassword get <key> - Gets the config value
             source.sendMessage(Component.text(
                     """
-                            loginPassword v%s by trim02
+                            loginPassword v%s (config v%s) by trim02
                             /loginpassword reload - Reloads the config
                             /loginpassword add <uuid|player> - Adds a player to the bypass list
                             /loginpassword remove <uuid|player> - Removes a player from the bypass list
                             /loginpassword list - Lists all players in the bypass list
                             /loginpassword config - Shows the current config
                             /loginpassword toggle - Enables/disables the plugin
-                            """.formatted(BuildConstants.VERSION), NamedTextColor.GREEN));
+                            """.formatted(BuildConstants.VERSION, BuildConstants.CONFIG_VERSION), NamedTextColor.GREEN));
             return;
         }
         switch (args[0]) {
