@@ -5,7 +5,7 @@
 	# The server name set in Velocity that the player will be transferred to after logging in. [Velocity Only]
 	hubServer = "hub"
 	# The password players must input to log in
-	serverPassword = "1234"
+	serverPassword = ["1234"]
 	# Change to false to make players have to write the password on every connection.
 	oneTimeLogin = true
     # Bypass settings require oneTimeLogin to be true

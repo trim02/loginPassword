@@ -4,5 +4,6 @@ package net.trim02.loginPassword;
 public class BuildConstants {
 
     public static final String VERSION = "${version}";
+    public static final Integer CONFIG_VERSION = ${configVersion};
     public static final String DIALOG_NAMESPACE = "loginpassword";
 }
