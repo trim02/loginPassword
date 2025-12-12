@@ -67,7 +67,6 @@ public class DialogLogin implements Listener {
         UUID playerUUID = connection.getProfile().getId();
 
 
-
         if (playerUUID == null) {
             event.getConnection().disconnect(Component.text("Internal server error"));
             logger.error("Player {} UUID is null", connection.getProfile().getName());
@@ -75,12 +74,7 @@ public class DialogLogin implements Listener {
         }
         if (configVar.oneTimeLogin) {
             if (isLuckPermsLoaded) {
-                var user = LuckPermsHook.api.getUserManager().getUser(playerUUID);
-                assert user != null;
-                if (user.getCachedData().getPermissionData().checkPermission(configVar.bypassNode).asBoolean()) {
-
                 if (LuckPermsHook.loadUser(playerUUID).getCachedData().getPermissionData().checkPermission(configVar.bypassNode).asBoolean()) {
-
                     return;
                 }
             }
@@ -106,7 +100,7 @@ public class DialogLogin implements Listener {
 
 
         if (!response.join()) {
-            audience.closeDialog();
+
             connection.disconnect(Component.text("Login failure"));
             logger.info("Player {} failed to log in", connection.getProfile().getName());
         }
@@ -171,14 +165,19 @@ public class DialogLogin implements Listener {
             configurationConnection.disconnect(Component.text(configVar.noPassword));
             setConnectionResult(playerUUID, false);
             return;
-        }
-        if (passwordInput.equals(configVar.serverPassword)) {
-            setConnectionResult(playerUUID, true);
         } else {
-            configurationConnection.getAudience().closeDialog();
-            configurationConnection.disconnect(Component.text(configVar.wrongPassword));
-            setConnectionResult(playerUUID, false);
+            for (String password : configVar.serverPassword) {
+                if (passwordInput.equals(password)) {
+//                    configurationConnection.getAudience().closeDialog();
+                    setConnectionResult(playerUUID, true);
+                    return;
+                }
+            }
         }
+        configurationConnection.getAudience().closeDialog();
+        configurationConnection.disconnect(Component.text(configVar.wrongPassword));
+        setConnectionResult(playerUUID, false);
+
 
     }
 
@@ -191,7 +190,7 @@ public class DialogLogin implements Listener {
     }
 
     @EventHandler
-    void onPlayerConnectionClose(PlayerConnectionCloseEvent event){
+    void onPlayerConnectionClose(PlayerConnectionCloseEvent event) {
         connectingPlayers.remove(event.getPlayerUniqueId());
     }
 
