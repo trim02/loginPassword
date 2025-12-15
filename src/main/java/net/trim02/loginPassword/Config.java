@@ -314,9 +314,14 @@ public class Config {
         config.load();
 
         if (Integer.parseInt(config.get("misc.configVersion").toString()) < 7) {
-            String oldServerPassword = config.get("core.serverPassword");
-            config.set("core.serverPassword", Collections.singletonList(oldServerPassword));
-            config.set("misc.configVersion", BuildConstants.CONFIG_VERSION);
+            if ((config.get("core.serverPassword") instanceof ArrayList<?>)) {
+                logger.info("serverPassword already migrated.");
+                config.set("misc.configVersion", BuildConstants.CONFIG_VERSION);
+            } else {
+                String oldServerPassword = config.get("core.serverPassword");
+                config.set("core.serverPassword", Collections.singletonList(oldServerPassword));
+                config.set("misc.configVersion", BuildConstants.CONFIG_VERSION);
+            }
         }
         config.save();
         config.close();
