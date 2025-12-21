@@ -127,6 +127,10 @@ public class loginPasswordVelocity implements loginPassword<ProxyServer> {
         return this.logger;
     }
 
+    public Boolean isDebugModeEnabled() {
+        return configVar.debugMode;
+    }
+
     @Override
     public ProxyServer getInterServer() {
         return this.server;

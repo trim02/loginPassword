@@ -68,6 +68,7 @@ public class loginPasswordPaper extends JavaPlugin implements loginPassword<Serv
             throw new RuntimeException(e);
         }
         try {
+            debugMessage("Registering events and commands...");
             this.getServer().getPluginManager().registerEvents(new DialogLogin(this, server, logger), this);
             new BypassList(logger, dataDirectory);
             BypassList.loadBypassList();
@@ -97,6 +98,10 @@ public class loginPasswordPaper extends JavaPlugin implements loginPassword<Serv
     @Override
     public Logger getInterLogger() {
         return this.getComponentLogger();
+    }
+
+    public Boolean isDebugModeEnabled() {
+        return Config.configVar.debugMode;
     }
 
     @Override

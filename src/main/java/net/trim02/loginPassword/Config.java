@@ -48,6 +48,7 @@ public class Config {
         public static Integer configVersion;
         public static Boolean pluginEnabled;
         public static String bypasserLoginExitMethod;
+        public static Boolean debugMode;
     }
     public ConfigSpec defaultConfig() {
         ConfigSpec spec = new ConfigSpec();
@@ -71,6 +72,7 @@ public class Config {
         spec.define("misc.loginCommandNode", "loginpassword.login");
         spec.define("misc.configVersion", BuildConstants.CONFIG_VERSION);
         spec.define("misc.pluginEnabled", true);
+        spec.define("misc.debugMode", false);
 
         return spec;
 
@@ -198,6 +200,7 @@ public class Config {
         configVar.configVersion = config.get("misc.configVersion");
         configVar.pluginEnabled = config.get("misc.pluginEnabled");
         configVar.bypasserLoginExitMethod = config.get("core.bypass.bypasserLoginExitMethod");
+        configVar.debugMode = config.get("misc.debugMode");
         config.close();
 
     }
@@ -274,6 +277,7 @@ public class Config {
         templateConfig.set("misc.loginCommandNode", isConfigCorrect("misc.loginCommandNode", config.get("misc.loginCommandNode")));
         templateConfig.set("misc.pluginEnabled", isConfigCorrect("misc.pluginEnabled", config.get("misc.pluginEnabled")));
         templateConfig.set("core.bypass.bypasserLoginExitMethod", isConfigCorrect("core.bypass.bypasserLoginExitMethod",config.get("core.bypass.bypasserLoginExitMethod")));
+        templateConfig.set("misc.debugMode", isConfigCorrect("misc.debugMode",config.get("misc.debugMode")));
 
         //    System.err.println("New Config values:");
         //    System.err.println("core.loginServer: " + templateConfig.get("core.loginServer"));

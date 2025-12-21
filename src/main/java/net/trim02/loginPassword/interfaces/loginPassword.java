@@ -9,9 +9,16 @@ public interface loginPassword<T> {
 
     String getPlatformName();
     Logger getInterLogger();
+    Boolean isDebugModeEnabled();
 
     Path getInterDataFolder();
 
     T getInterServer();
+
+    default void debugMessage(String message) {
+        if (isDebugModeEnabled()) {
+            getInterLogger().info("[Debug] {}", message);
+        }
+    }
 
 }
