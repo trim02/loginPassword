@@ -52,6 +52,7 @@ public class AdminCommand implements BasicCommand {
         switch (args[0]) {
             case "reload" -> {
                 config.reloadConfig();
+                plugin.reenableEvents();
                 source.sendMessage(Component.text("Config reloaded", NamedTextColor.GREEN));
             }
             case "config" -> source.sendMessage(Component.text(
