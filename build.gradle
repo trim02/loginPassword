@@ -74,7 +74,7 @@ tasks {
         minecraftVersion("1.21.8")
         runDirectory = file("${project.rootDir}/run/paper")
         downloadPlugins {
-            url("https://download.luckperms.net/1606/bukkit/loader/LuckPerms-Bukkit-5.5.17.jar")
+            url("https://download.luckperms.net/1617/bukkit/loader/LuckPerms-Bukkit-5.5.29.jar")
             modrinth("ViaBackwards", "9FX5j3OU")
             modrinth("ViaVersion","b7fitAW8")
         }
