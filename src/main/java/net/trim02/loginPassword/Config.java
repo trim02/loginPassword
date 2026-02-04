@@ -24,8 +24,11 @@ public class Config {
         this.dataDirectory = dataDirectory;
         this.defaultSpec = defaultConfig();
         com.electronwill.nightconfig.core.Config.setInsertionOrderPreserved(true);
-
-
+    }
+    void debugMessage(String message) {
+        if (configVar.debugMode) {
+            logger.info("[Debug] {}", message);
+        }
     }
 
     public static class configVar {
@@ -55,7 +58,7 @@ public class Config {
 
         spec.define("core.loginServer", "login");
         spec.define("core.hubServer", "hub");
-        spec.define("core.serverPassword", new ArrayList(Collections.singleton("1234")));
+        spec.define("core.serverPassword", new ArrayList<>(Collections.singleton("1234")));
         spec.define("core.oneTimeLogin", false);
         spec.define("core.bypass.pluginGrantsBypass", true);
         spec.define("core.bypass.disableLoginCommandOnBypass", true);
@@ -75,13 +78,10 @@ public class Config {
         spec.define("misc.debugMode", false);
 
         return spec;
-
     }
 
     public Object isConfigCorrect(String key, Object value) {
        return defaultSpec.correct(key, value);
-
-
     }
     public boolean validateConfig(Path configFile) {
         CommentedFileConfig config = CommentedFileConfig.of(configFile);
@@ -314,12 +314,11 @@ public class Config {
     }
 
     protected void preStandardMigration(CommentedFileConfig config){
-        logger.warn("Pre-standard migration started.");
         config.load();
-
+        debugMessage("Starting pre-standard migration.");
         if (Integer.parseInt(config.get("misc.configVersion").toString()) < 7) {
             if ((config.get("core.serverPassword") instanceof ArrayList<?>)) {
-                logger.info("serverPassword already migrated.");
+                debugMessage("serverPassword already migrated.");
                 config.set("misc.configVersion", BuildConstants.CONFIG_VERSION);
             } else {
                 String oldServerPassword = config.get("core.serverPassword");
@@ -329,7 +328,6 @@ public class Config {
         }
         config.save();
         config.close();
-        logger.info("Pre-standard migration completed.");
     }
 
 
