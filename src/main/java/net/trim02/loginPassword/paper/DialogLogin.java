@@ -40,7 +40,7 @@ public class DialogLogin implements Listener {
     private static boolean isViaLoaded;
     private static boolean isLuckPermsLoaded;
     private final Logger logger;
-    private final Map<UUID, CompletableFuture<Boolean>> connectingPlayers = new ConcurrentHashMap<>();
+    private final Map<UUID, CompletableFuture<LoginResult>> connectingPlayers = new ConcurrentHashMap<>();
     private loginPasswordPaper plugin;
     private Server server;
     private Dialog loginDialog;
@@ -54,9 +54,17 @@ public class DialogLogin implements Listener {
         isViaLoaded = server.getPluginManager().getPlugin("ViaVersion") != null;
     }
 
+    enum LoginResult {
+        SUCCESS,
+        FAILURE,
+        TIMEOUT,
+        ERROR,
+        EXIT
+    }
+
     Dialog createDialog() {
         Dialog dialog_login = Dialog.create(
-                builer -> builer.empty().base(
+                builder -> builder.empty().base(
                         DialogBase.builder(
                                         MiniMessage.miniMessage().deserialize(configVar.welcomeMessage)
                                 ).
@@ -96,7 +104,6 @@ public class DialogLogin implements Listener {
 //        Dialog dialog = RegistryAccess.registryAccess().getRegistry(RegistryKey.DIALOG).get(Key.key(DIALOG_NAMESPACE, "login_dialog"));
         Dialog dialog = this.loginDialog;
         if (dialog == null) {
-
             event.getConnection().disconnect(Component.text("Internal server error"));
             logger.error("Failed to load dialog for player {}", event.getConnection().getProfile().getName());
             return;
@@ -104,7 +111,6 @@ public class DialogLogin implements Listener {
 
         PlayerConfigurationConnection connection = event.getConnection();
         UUID playerUUID = connection.getProfile().getId();
-
 
         if (playerUUID == null) {
             event.getConnection().disconnect(Component.text("Internal server error"));
@@ -118,7 +124,6 @@ public class DialogLogin implements Listener {
                 }
             }
             if (BypassList.inBypassList(playerUUID)) {
-
                 return;
             }
         }
@@ -130,20 +135,29 @@ public class DialogLogin implements Listener {
                 return;
             }
         }
-        CompletableFuture<Boolean> response = new CompletableFuture<>();
-        response.completeOnTimeout(false, configVar.kickTimeout, TimeUnit.SECONDS);
+        CompletableFuture<LoginResult> response = new CompletableFuture<>();
+        response.completeOnTimeout(LoginResult.TIMEOUT, configVar.kickTimeout, TimeUnit.SECONDS);
         connectingPlayers.put(playerUUID, response);
 
         Audience audience = connection.getAudience();
         audience.showDialog(dialog);
 
-
-        if (!response.join()) {
-
+        if (response.join().equals(LoginResult.TIMEOUT)) {
+            audience.closeDialog();
+            connection.disconnect(Component.text(configVar.kickMessage));
+        }
+        if (response.join().equals(LoginResult.ERROR)){
+            connection.disconnect(Component.text("Internal server error"));
+            logger.error("An error occurred while processing login for player {}", connection.getProfile().getName());
+        }
+        if (response.join().equals(LoginResult.FAILURE)) {
             connection.disconnect(Component.text("Login failure"));
             logger.info("Player {} failed to log in", connection.getProfile().getName());
         }
-        if (response.isDone() && response.join() && (configVar.oneTimeLogin && configVar.pluginGrantsBypass)) {
+        if (response.join().equals(LoginResult.EXIT)) {
+            connection.disconnect(Component.text("Disconnected from server"));
+        }
+        if (response.isDone() && response.join().equals(LoginResult.SUCCESS) && (configVar.oneTimeLogin && configVar.pluginGrantsBypass)) {
             if (isLuckPermsLoaded) {
                 if (configVar.bypassMethod.equalsIgnoreCase("user")) {
                     LuckPermsHook.addNode(playerUUID, configVar.bypassNode);
@@ -171,6 +185,7 @@ public class DialogLogin implements Listener {
         }
 
         UUID playerUUID = configurationConnection.getProfile().getId();
+
         if (playerUUID == null) {
 
             configurationConnection.disconnect(Component.text("Internal server error"));
@@ -182,47 +197,46 @@ public class DialogLogin implements Listener {
         DialogResponseView responseView = event.getDialogResponseView();
 
         if (responseView == null) {
-            configurationConnection.disconnect(Component.text("Internal server error"));
             logger.error("DialogResponseView is null for player {}", playerUUID);
-            setConnectionResult(playerUUID, false);
+            setConnectionResult(playerUUID, LoginResult.ERROR);
             return;
         }
         if (dialogKey.equals(Key.key(DIALOG_NAMESPACE, "exit_login"))) {
+            setConnectionResult(playerUUID, LoginResult.EXIT);
             configurationConnection.getAudience().closeDialog();
-            configurationConnection.disconnect(Component.text("Disconnected from server"));
-            setConnectionResult(playerUUID, false);
-
             return;
         }
         if (!dialogKey.equals(Key.key(DIALOG_NAMESPACE, "submit_login"))) {
-            configurationConnection.disconnect(Component.text("Internal server error"));
-            setConnectionResult(playerUUID, false);
+            setConnectionResult(playerUUID, LoginResult.ERROR);
             return;
         }
+
         String passwordInput = responseView.getText("password_input");
+
         if (passwordInput.isEmpty()) {
             configurationConnection.disconnect(Component.text(configVar.noPassword));
-            setConnectionResult(playerUUID, false);
+            setConnectionResult(playerUUID, LoginResult.FAILURE);
             return;
         } else {
             for (String password : configVar.serverPassword) {
                 if (passwordInput.equals(password)) {
 //                    configurationConnection.getAudience().closeDialog();
-                    setConnectionResult(playerUUID, true);
+                    setConnectionResult(playerUUID, LoginResult.SUCCESS);
                     return;
                 }
             }
         }
+
         configurationConnection.getAudience().closeDialog();
         configurationConnection.disconnect(Component.text(configVar.wrongPassword));
-        setConnectionResult(playerUUID, false);
+        setConnectionResult(playerUUID, LoginResult.FAILURE);
 
 
     }
 
 
-    private void setConnectionResult(UUID playerUUID, boolean value) {
-        CompletableFuture<Boolean> response = connectingPlayers.get(playerUUID);
+    private void setConnectionResult(UUID playerUUID, LoginResult value) {
+        CompletableFuture<LoginResult> response = connectingPlayers.get(playerUUID);
         if (response != null) {
             response.complete(value);
         }
