@@ -1,7 +1,7 @@
 name: loginPassword
 version: ${version}
 main: net.trim02.loginPassword.loginPasswordPaper
-bootstrapper: net.trim02.loginPassword.paper.loginPasswordBootstrap
+#bootstrapper: net.trim02.loginPassword.paper.loginPasswordBootstrap
 api-version: '${apiVersion}'
 author: trim02
 dependencies:

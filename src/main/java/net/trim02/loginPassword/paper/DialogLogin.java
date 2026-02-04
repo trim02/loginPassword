@@ -8,9 +8,15 @@ import io.papermc.paper.event.connection.configuration.AsyncPlayerConnectionConf
 import io.papermc.paper.event.player.PlayerCustomClickEvent;
 import io.papermc.paper.registry.RegistryAccess;
 import io.papermc.paper.registry.RegistryKey;
+import io.papermc.paper.registry.data.dialog.ActionButton;
+import io.papermc.paper.registry.data.dialog.DialogBase;
+import io.papermc.paper.registry.data.dialog.action.DialogAction;
+import io.papermc.paper.registry.data.dialog.input.DialogInput;
+import io.papermc.paper.registry.data.dialog.type.DialogType;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.trim02.loginPassword.Config.configVar;
 import net.trim02.loginPassword.common.BypassList;
 import net.trim02.loginPassword.common.LuckPermsHook;
@@ -21,6 +27,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.slf4j.Logger;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -36,14 +43,46 @@ public class DialogLogin implements Listener {
     private final Map<UUID, CompletableFuture<Boolean>> connectingPlayers = new ConcurrentHashMap<>();
     private loginPasswordPaper plugin;
     private Server server;
+    private Dialog loginDialog;
 
     public DialogLogin(loginPasswordPaper plugin, Server server, Logger logger) {
         this.plugin = plugin;
         this.server = server;
         this.logger = logger;
-
+        this.loginDialog = createDialog();
         isLuckPermsLoaded = server.getPluginManager().getPlugin("LuckPerms") != null;
         isViaLoaded = server.getPluginManager().getPlugin("ViaVersion") != null;
+    }
+
+    Dialog createDialog() {
+        Dialog dialog_login = Dialog.create(
+                builer -> builer.empty().base(
+                        DialogBase.builder(
+                                        MiniMessage.miniMessage().deserialize(configVar.welcomeMessage)
+                                ).
+                                canCloseWithEscape(false).
+                                inputs(
+                                        List.of(
+                                                DialogInput.text("password_input", Component.text("password")).build()
+                                        )
+                                ).build()
+                ).type(DialogType.confirmation(
+                                ActionButton.create(
+                                        Component.text("Login"),
+                                        Component.text("Click to Submit"),
+                                        200,
+                                        DialogAction.customClick(Key.key(DIALOG_NAMESPACE, "submit_login"), null)
+                                ),
+                                ActionButton.create(
+                                        Component.text("Exit"),
+                                        Component.text("Click to Exit"),
+                                        200,
+                                        DialogAction.customClick(Key.key(DIALOG_NAMESPACE, "exit_login"), null)
+                                )
+                        )
+                )
+        );
+        return dialog_login;
     }
 
 
@@ -54,8 +93,8 @@ public class DialogLogin implements Listener {
         }
 
 
-        Dialog dialog = RegistryAccess.registryAccess().getRegistry(RegistryKey.DIALOG).get(Key.key(DIALOG_NAMESPACE, "login_dialog"));
-
+//        Dialog dialog = RegistryAccess.registryAccess().getRegistry(RegistryKey.DIALOG).get(Key.key(DIALOG_NAMESPACE, "login_dialog"));
+        Dialog dialog = this.loginDialog;
         if (dialog == null) {
 
             event.getConnection().disconnect(Component.text("Internal server error"));
