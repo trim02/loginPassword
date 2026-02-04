@@ -35,20 +35,26 @@ public class LoginCommand implements SimpleCommand {
             return;
         }
         if (source instanceof Player player && !args[0].isEmpty()) {
+            int loopCount = 0;
+            boolean loggedIn = false;
             for (String password : configVar.serverPassword) {
                 if (args[0].equals(password)) {
                     Optional<RegisteredServer> connectToServer = server.getServer(configVar.hubServer);
                     player.createConnectionRequest(connectToServer.get()).connectWithIndication();
-                    return;
+                    logger.info("Player {} has logged in", player.getUsername());
+                    loggedIn = true;
                 } else {
-                    source.sendMessage(Component.text(configVar.wrongPassword, NamedTextColor.RED));
+                    loopCount++;
+                    if ((loopCount >= configVar.serverPassword.size())) {
+                        source.sendMessage(Component.text(configVar.wrongPassword, NamedTextColor.RED));
+                    }
                 }
-            }
 //            Optional<RegisteredServer> connectToServer = server.getServer(configVar.hubServer);
 //            player.createConnectionRequest(connectToServer.get()).connectWithIndication();
 
-            // logger.info("Player {} has logged in", player.getUsername());
+                // logger.info("Player {} has logged in", player.getUsername());
 
+            }
         }
 //        else if (!args[0].equals(configVar.serverPassword)) {
 //            source.sendMessage(Component.text(configVar.wrongPassword, NamedTextColor.RED));

@@ -88,12 +88,12 @@ public class loginPasswordVelocity implements loginPassword<ProxyServer> {
         CommandMeta commandMetaAdmin = commandManager.metaBuilder("loginpasswordvelocity").plugin(this).build();
 
         if (server.getPluginManager().isLoaded("luckperms")) {
-            logger.debug("luckperms found!");
+            debugMessage("luckperms found!");
             SimpleCommand loginCommand = new LoginCommandLuckPerms(server, logger);
             commandManager.register(commandMetaLogin, loginCommand);
         } else {
             if(configVar.pluginGrantsBypass.equals(true) && configVar.oneTimeLogin.equals(true)){
-                logger.warn("pluginGrantsBypass is set to true but LuckPerms is not found. Please disable pluginGrantsBypass in the config file, as this setting will not work without LuckPerms. Bypass permissions must be granted manually.");
+                logger.warn("pluginGrantsBypass is set to true but LuckPerms is not found. Bypass permissions must be granted manually.");
             }
             SimpleCommand loginCommand = new LoginCommand(server, logger);
             commandManager.register(commandMetaLogin, loginCommand);
