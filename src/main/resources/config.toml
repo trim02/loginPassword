@@ -4,7 +4,8 @@
 	loginServer = "login"
 	# The server name set in Velocity that the player will be transferred to after logging in. [Velocity Only]
 	hubServer = "hub"
-	# The password players must input to log in
+	# The password(s) players must input to log in
+    # Multiple passwords can be set. Add more passwords by adding them to the list like ["1234", "password"]
 	serverPassword = ["1234"]
 	# Change to false to make players have to write the password on every connection.
 	oneTimeLogin = true
@@ -37,7 +38,8 @@
 	# Messages to be sent to player when they do not provide or gives a wrong password
     wrongPassword = "Wrong Password."
 	noPassword = "Please provide the password. It can be found on Discord"
-	# Shows as a message if the join the login server [Velocity Only], or shown as a title in the dialog [Paper Only]
+	# Shows as a message if they join the login server [Velocity Only], or shown as a title in the dialog [Paper Only].
+    # Accepts MiniMessage formatting when using Paper. https://docs.papermc.io/adventure/minimessage/format/
 	welcomeMessage = "Please enter the server password to continue."
 
 
