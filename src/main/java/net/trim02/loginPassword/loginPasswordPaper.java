@@ -119,10 +119,6 @@ public class loginPasswordPaper extends JavaPlugin implements loginPassword<Serv
         return this.getComponentLogger();
     }
 
-    public Boolean isDebugModeEnabled() {
-        return Config.configVar.debugMode;
-    }
-
     @Override
     public Path getInterDataFolder() {
         return dataDirectory;
