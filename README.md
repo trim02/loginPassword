@@ -1,5 +1,8 @@
 # LoginPassword Plugin
 
+[![Modrinth](https://img.shields.io/badge/Modrinth-grey?logo=modrinth)](https://modrinth.com/plugin/loginpassword)
+[![Hangar](https://img.shields.io/badge/Hangar-grey)](https://hangar.papermc.io/trim02/loginPassword)
+
 ## Overview
 
 This plugin is an alternative way to control access to a minecraft server, without using a whitelist.
