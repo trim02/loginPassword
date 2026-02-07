@@ -1,12 +1,16 @@
 package net.trim02.loginPassword;
 
+import com.destroystokyo.paper.event.player.PlayerConnectionCloseEvent;
 import com.technicjelle.UpdateChecker;
 import io.papermc.paper.command.brigadier.BasicCommand;
+import io.papermc.paper.event.connection.configuration.AsyncPlayerConnectionConfigureEvent;
+import io.papermc.paper.event.player.PlayerCustomClickEvent;
 import net.trim02.loginPassword.common.BypassList;
 import net.trim02.loginPassword.interfaces.loginPassword;
 import net.trim02.loginPassword.paper.AdminCommand;
 import net.trim02.loginPassword.paper.DialogLogin;
 import org.bukkit.Server;
+import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -68,6 +72,7 @@ public class loginPasswordPaper extends JavaPlugin implements loginPassword<Serv
             throw new RuntimeException(e);
         }
         try {
+            debugMessage("Registering events and commands...");
             this.getServer().getPluginManager().registerEvents(new DialogLogin(this, server, logger), this);
             new BypassList(logger, dataDirectory);
             BypassList.loadBypassList();
@@ -86,6 +91,21 @@ public class loginPasswordPaper extends JavaPlugin implements loginPassword<Serv
 
     }
 
+    public void reenableEvents() {
+        try {
+            debugMessage("Re-registering events...");
+            HandlerList apcceHL = AsyncPlayerConnectionConfigureEvent.getHandlerList();
+            HandlerList pcceHL = PlayerCustomClickEvent.getHandlerList();
+            HandlerList pconceHL = PlayerConnectionCloseEvent.getHandlerList();
+            apcceHL.unregister(this);
+            pcceHL.unregister(this);
+            pconceHL.unregister(this);
+            this.getServer().getPluginManager().registerEvents(new DialogLogin(this, server, logger), this);
+        } catch (Exception e) {
+            logger.error("Failed to re-register events: ", e);
+            throw new RuntimeException(e);
+        }
+    }
 
 
 

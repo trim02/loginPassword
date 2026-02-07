@@ -1,5 +1,8 @@
 # LoginPassword Plugin
 
+[![Modrinth](https://img.shields.io/badge/Modrinth-grey?logo=modrinth)](https://modrinth.com/plugin/loginpassword)
+[![Hangar](https://img.shields.io/badge/Hangar-grey)](https://hangar.papermc.io/trim02/loginPassword)
+
 ## Overview
 
 This plugin is an alternative way to control access to a minecraft server, without using a whitelist.
@@ -25,7 +28,7 @@ The plugin uses a TOML configuration file (`config.toml`) to manage its settings
 #### core
 - `loginServer`: The server where players are redirected for login. [Velocity Only]
 - `hubServer`: The main server. [Velocity Only]
-- `serverPassword`: The password required for login.
+- `serverPassword`: The password(s) required for login. Can be multiple.
 - `oneTimeLogin`: Boolean to enable/disable one-time login. Default is `true`.
 #### core.bypass
 - `bypassNode`: The permission node for bypassing login.
@@ -41,12 +44,13 @@ The plugin uses a TOML configuration file (`config.toml`) to manage its settings
 #### messages
 - `noPassword`: Message displayed when no password is provided.
 - `wrongPassword`: Message displayed when the wrong password is provided.
-- `welcomeMessage`: Message to be displayed when someone joins the login server. If on Velocity, it will be a message sent to the player upon joing the login server. If on Paper, it will be the title of the dialog login prompt.
+- `welcomeMessage`: Message to be displayed when someone joins the login server. If on Velocity, it will be a message sent to the player upon joing the login server. If on Paper, it will be the title of the dialog login prompt. Accepts MiniMessage formatting. [See PaperMC for info](https://docs.papermc.io/adventure/minimessage/format/).
 #### misc
 - `loginCommandGrantedToEveryone`: Boolean to grant the login command to everyone. Default is `true`. [Velocity Only]
-- `loginCommandNode`: The permission node for the login command. Default is `loginpassword.login`.
+- `loginCommandNode`: The permission node for the login command. Default is `loginpassword.login`. [Velocity Only]
 - `pluginEnabled`: Boolean to enable/disable the plugin. Default is `true`.
-- `configVersion`: Version of the plugin this config file was last migrated to. Do not touch.
+- `debugMode`: Boolean to enable/disable debug logging. Default is `false`.
+- `configVersion`: Version of the config file. Do not touch.
 
 ## Installation
 
@@ -68,6 +72,7 @@ The plugin uses a TOML configuration file (`config.toml`) to manage its settings
 2. Place the JAR file in the `plugins` directory of your paper server.
 3. Start the server to generate the default configuration file.
 4. Edit the `config.toml` file in the `plugins/LoginPassword` directory to suit your needs.
+5. Restart the server or reload using `/loginpassword reload` to apply the new configuration.
 
 ## Usage
 
@@ -75,7 +80,8 @@ Once installed and configured, the plugin will prompt players to enter a passwor
 
 ### Commands
 - `/login <password>` Command used to login when at the login server [Velocity Only]
-- `/loginpassword <subcommand>`
+- `/loginpassword(velocity) <subcommand>` 
+  - Must be run by a player with permission node `loginpassword.admin` or from the console.
   - `reload` reload the config file and bypass list.
   - `add <uuid|player>` add player to the bypass list
   - `remove <uuid|player>` remove player from the bypass list

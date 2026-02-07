@@ -20,7 +20,7 @@ public class MojangApi {
     }
 
     public static String getUUID(String username) {
-        System.out.println("Fetching UUID for username: " + username);
+//        System.out.println("Fetching UUID for username: " + username);
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(constructApiUrl("minecraft/profile/lookup/name/", username)))
                 .GET()

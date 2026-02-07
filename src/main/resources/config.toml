@@ -4,8 +4,9 @@
 	loginServer = "login"
 	# The server name set in Velocity that the player will be transferred to after logging in. [Velocity Only]
 	hubServer = "hub"
-	# The password players must input to log in
-	serverPassword = "1234"
+	# The password(s) players must input to log in
+    # Multiple passwords can be set. Add more passwords by adding them to the list like ["1234", "password"]
+	serverPassword = ["1234"]
 	# Change to false to make players have to write the password on every connection.
 	oneTimeLogin = true
     # Bypass settings require oneTimeLogin to be true
@@ -37,13 +38,15 @@
 	# Messages to be sent to player when they do not provide or gives a wrong password
     wrongPassword = "Wrong Password."
 	noPassword = "Please provide the password. It can be found on Discord"
-	# Shows as a message if the join the login server [Velocity Only], or shown as a title in the dialog [Paper Only]
+	# Shows as a message if they join the login server [Velocity Only], or shown as a title in the dialog [Paper Only].
+    # Accepts MiniMessage formatting when using Paper. https://docs.papermc.io/adventure/minimessage/format/
 	welcomeMessage = "Please enter the server password to continue."
 
 
 [misc]
-	configVersion = "2.0"
+	configVersion = ${configVersion}
 	pluginEnabled = true
+	debugMode = false
 	# set to false to make the login command only accessible to players with the permission node loginpassword.login. [Velocity Only]
 	# this could be used to have a private server where only some players have access to. oneTimeLogin must be disabled otherwise players with the bypass permissions will always be sent to the private server.
 	loginCommandGrantedToEveryone = true

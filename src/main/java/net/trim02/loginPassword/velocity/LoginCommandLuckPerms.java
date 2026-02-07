@@ -33,16 +33,30 @@ public class LoginCommandLuckPerms extends LoginCommand {
             source.sendMessage(Component.text(configVar.noPassword, NamedTextColor.RED));
             return;
         }
-        if (source instanceof Player player && args[0].equals(configVar.serverPassword)) {
-            Optional<RegisteredServer> connectToServer = server.getServer(configVar.hubServer);
-            player.createConnectionRequest(connectToServer.get()).connectWithIndication();
+        if (source instanceof Player player && !args[0].isEmpty()) {
+            int loopCount = 0;
+            boolean loggedIn = false;
+            for (String password : configVar.serverPassword) {
+                if (args[0].equals(password)) {
+                    Optional<RegisteredServer> connectToServer = server.getServer(configVar.hubServer);
+                    player.createConnectionRequest(connectToServer.get()).connectWithIndication();
+                    logger.info("Player {} has logged in", player.getUsername());
+                    loggedIn = true;
+                } else {
+                    loopCount++;
+                    if ((loopCount >= configVar.serverPassword.size())) {
+                        source.sendMessage(Component.text(configVar.wrongPassword, NamedTextColor.RED));
+                    }
+                }
+            }
+//            Optional<RegisteredServer> connectToServer = server.getServer(configVar.hubServer);
+//            player.createConnectionRequest(connectToServer.get()).connectWithIndication();
 
-            logger.info("Player {} has logged in", player.getUsername());
 
-            if (!player.hasPermission(configVar.bypassNode) && (configVar.oneTimeLogin && configVar.pluginGrantsBypass)
-                    && args[0].equals(configVar.serverPassword)) {
 
-                // logger.info("Granting bypass permission to user {}", player.getUsername());
+            if (!player.hasPermission(configVar.bypassNode) && (configVar.oneTimeLogin && configVar.pluginGrantsBypass && loggedIn)) {
+
+//                 logger.info("Granting bypass permission to user {}", player.getUsername());
 
                 if (configVar.bypassMethod.equalsIgnoreCase("user")) {
                     lpApi.getUserManager().modifyUser(player.getUniqueId(), user -> {
@@ -66,9 +80,11 @@ public class LoginCommandLuckPerms extends LoginCommand {
                             Component.text("An error occurred. Please inform server staff.", NamedTextColor.RED));
                 }
             }
-        } else if (!args[0].equals(configVar.serverPassword)) {
-            source.sendMessage(Component.text(configVar.wrongPassword, NamedTextColor.RED));
-        } else if (source instanceof ConsoleCommandSource) {
+        }
+//        else if (!args[0].equals(configVar.serverPassword)) {
+//            source.sendMessage(Component.text(configVar.wrongPassword, NamedTextColor.RED));
+//        }
+        else if (source instanceof ConsoleCommandSource) {
             source.sendMessage(Component.text("This command can only be run by a player", NamedTextColor.RED));
         } else {
             source.sendMessage(

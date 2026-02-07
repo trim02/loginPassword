@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class Config {
     protected final Logger logger;
@@ -22,14 +24,17 @@ public class Config {
         this.dataDirectory = dataDirectory;
         this.defaultSpec = defaultConfig();
         com.electronwill.nightconfig.core.Config.setInsertionOrderPreserved(true);
-
-
+    }
+    void debugMessage(String message) {
+        if (configVar.debugMode) {
+            logger.info("[Debug] {}", message);
+        }
     }
 
     public static class configVar {
         public static String loginServer;
         public static String hubServer;
-        public static String serverPassword;
+        public static ArrayList<String> serverPassword;
         public static Boolean oneTimeLogin;
         public static String bypassNode;
         public static Boolean pluginGrantsBypass;
@@ -43,16 +48,17 @@ public class Config {
         public static String welcomeMessage;
         public static Boolean loginCommandNegated;
         public static String loginCommandNode;
-        public static String configVersion;
+        public static Integer configVersion;
         public static Boolean pluginEnabled;
         public static String bypasserLoginExitMethod;
+        public static Boolean debugMode;
     }
     public ConfigSpec defaultConfig() {
         ConfigSpec spec = new ConfigSpec();
 
         spec.define("core.loginServer", "login");
         spec.define("core.hubServer", "hub");
-        spec.define("core.serverPassword", "1234");
+        spec.define("core.serverPassword", new ArrayList<>(Collections.singleton("1234")));
         spec.define("core.oneTimeLogin", false);
         spec.define("core.bypass.pluginGrantsBypass", true);
         spec.define("core.bypass.disableLoginCommandOnBypass", true);
@@ -67,24 +73,43 @@ public class Config {
         spec.define("messages.welcomeMessage", "Please type /login <password> to log in.");
         spec.define("misc.loginCommandGrantedToEveryone", true);
         spec.define("misc.loginCommandNode", "loginpassword.login");
-        spec.define("misc.configVersion", BuildConstants.VERSION);
+        spec.define("misc.configVersion", BuildConstants.CONFIG_VERSION);
         spec.define("misc.pluginEnabled", true);
+        spec.define("misc.debugMode", false);
 
         return spec;
-
     }
 
     public Object isConfigCorrect(String key, Object value) {
        return defaultSpec.correct(key, value);
-
-
     }
-    public void validateConfig(Path configFile) {
+    public boolean validateConfig(Path configFile) {
         CommentedFileConfig config = CommentedFileConfig.of(configFile);
         config.load();
+        if (config.get("misc.configVersion") instanceof String) {
+            config.set("misc.configVersion", 6);
+            logger.warn("Config version was a string. Set to 6 for migration.");
+            config.save();
+            config.close();
+            return true;
+        }
+        switch ((Integer) config.get("misc.configVersion")) {
+            case null -> {
+                logger.warn("Config version is missing. Pre-migration required.");
+                return true;
+            }
+            case 6 -> {
+                logger.info("Config version 6 detected. Pre-migration required.");
+                return true;
+            }
+            default -> {
+
+            }
+        }
         defaultSpec.correct(config);
         config.save();
         config.close();
+        return false;
 
     }
 
@@ -115,10 +140,15 @@ public class Config {
                 throw new RuntimeException(e);
             }
         }
-        validateConfig(configFile);
+        boolean preMigrationRequired = validateConfig(configFile);
+        if (preMigrationRequired){
+            preStandardMigration(CommentedFileConfig.of(configFile));
+            initConfig();
+            return;
+        }
         getTomlConfig(configFile);
         // Check if local config file version value is different from plugin version
-        if(!configVar.configVersion.equals(BuildConstants.VERSION)){
+        if(configVar.configVersion != BuildConstants.CONFIG_VERSION) {
             // logger.warn("Config file version is different from plugin version. Migrating config file to new version.");
             migrateConfigVersion();
             initConfig();
@@ -153,7 +183,7 @@ public class Config {
         config.load();
         configVar.loginServer = config.get("core.loginServer");
         configVar.hubServer = config.get("core.hubServer");
-        configVar.serverPassword = config.get("core.serverPassword");
+        configVar.serverPassword = (config.get("core.serverPassword"));
         configVar.oneTimeLogin = config.get("core.oneTimeLogin");
         configVar.pluginGrantsBypass = config.get("core.bypass.pluginGrantsBypass");
         configVar.disableLoginCommandOnBypass = config.get("core.bypass.disableLoginCommandOnBypass");
@@ -170,6 +200,7 @@ public class Config {
         configVar.configVersion = config.get("misc.configVersion");
         configVar.pluginEnabled = config.get("misc.pluginEnabled");
         configVar.bypasserLoginExitMethod = config.get("core.bypass.bypasserLoginExitMethod");
+        configVar.debugMode = config.get("misc.debugMode");
         config.close();
 
     }
@@ -246,6 +277,7 @@ public class Config {
         templateConfig.set("misc.loginCommandNode", isConfigCorrect("misc.loginCommandNode", config.get("misc.loginCommandNode")));
         templateConfig.set("misc.pluginEnabled", isConfigCorrect("misc.pluginEnabled", config.get("misc.pluginEnabled")));
         templateConfig.set("core.bypass.bypasserLoginExitMethod", isConfigCorrect("core.bypass.bypasserLoginExitMethod",config.get("core.bypass.bypasserLoginExitMethod")));
+        templateConfig.set("misc.debugMode", isConfigCorrect("misc.debugMode",config.get("misc.debugMode")));
 
         //    System.err.println("New Config values:");
         //    System.err.println("core.loginServer: " + templateConfig.get("core.loginServer"));
@@ -279,10 +311,27 @@ public class Config {
         catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-
-
     }
+
+    protected void preStandardMigration(CommentedFileConfig config){
+        config.load();
+        debugMessage("Starting pre-standard migration.");
+        if (Integer.parseInt(config.get("misc.configVersion").toString()) < 7) {
+            if ((config.get("core.serverPassword") instanceof ArrayList<?>)) {
+                debugMessage("serverPassword already migrated.");
+                config.set("misc.configVersion", BuildConstants.CONFIG_VERSION);
+            } else {
+                String oldServerPassword = config.get("core.serverPassword");
+                config.set("core.serverPassword", Collections.singletonList(oldServerPassword));
+                config.set("misc.configVersion", BuildConstants.CONFIG_VERSION);
+            }
+        }
+        config.save();
+        config.close();
+    }
+
+
+
     public void migrateYamlToToml() {
         Path yamlFile = dataDirectory.resolve("config.yml");
         Path tomlFile = dataDirectory.resolve("config.toml");
