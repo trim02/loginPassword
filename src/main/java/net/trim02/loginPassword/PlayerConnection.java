@@ -16,10 +16,7 @@ import net.trim02.loginPassword.Config.configVar;
 import net.trim02.loginPassword.common.BypassList;
 import org.slf4j.Logger;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -49,10 +46,10 @@ public class PlayerConnection {
                 connectToServer.get().ping().get();
                 event.setInitialServer(connectToServer.get());
                 player.sendMessage(Component.text(configVar.welcomeMessage, NamedTextColor.GREEN));
-            } catch (InterruptedException | ExecutionException e) {
+            } catch (Exception e) {
                 event.setInitialServer(null);
-                logger.error("Error pinging login server: " + e.getMessage());
-                logger.error("Make sure the login server is online");
+                logger.error("Error pinging login server: {}, Exception type: {}", e.getMessage(), e.getClass().getName());
+                logger.error("Make sure the login server is online or exists");
 
 //                player.disconnect(Component.text("Failed to connect to server", NamedTextColor.RED));
 
