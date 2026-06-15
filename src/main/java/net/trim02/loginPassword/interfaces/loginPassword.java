@@ -20,6 +20,8 @@
 
 package net.trim02.loginPassword.interfaces;
 
+import com.technicjelle.UpdateChecker;
+import net.trim02.loginPassword.BuildConstants;
 import net.trim02.loginPassword.Config;
 import org.slf4j.Logger;
 
@@ -40,6 +42,27 @@ public interface loginPassword<T> {
         if (isDebugModeEnabled()) {
             getInterLogger().info("[Debug] {}", message);
         }
+    }
+
+    default void updateCheck() {
+        UpdateChecker updateChecker = new UpdateChecker("trim02", "loginPassword", BuildConstants.VERSION);
+
+        try {
+            updateChecker.check();
+            if(updateChecker.isUpdateAvailable()) {
+                var updateMessage = """
+                            A new version is available: %s -> %s. Download the new version here:
+                            modrinth: https://modrinth.com/plugin/loginpassword
+                            Hangar: https://hangar.papermc.io/trim02/loginPassword
+                            GitHub: %s
+                            """.formatted(updateChecker.getCurrentVersion(), updateChecker.getLatestVersion(), updateChecker.getUpdateUrl());
+                getInterLogger().info(updateMessage);
+            }
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
+        }
+
+
     }
 
 }
