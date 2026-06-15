@@ -1,3 +1,23 @@
+/*
+ *     loginPassword
+ *     Copyright (c) 2025. trim02
+ *
+ *     This library is free software; you can redistribute it and/or
+ *     modify it under the terms of the GNU Lesser General Public
+ *     License as published by the Free Software Foundation; either
+ *     version 2.1 of the License, or (at your option) any later version.
+ *
+ *     This library is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *     Lesser General Public License for more details.
+ *
+ *     You should have received a copy of the GNU Lesser General Public
+ *     License along with this library; if not, write to the Free Software
+ *     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
+ *     USA
+ */
+
 package net.trim02.loginPassword;
 
 import com.velocitypowered.api.event.Subscribe;
@@ -16,10 +36,7 @@ import net.trim02.loginPassword.Config.configVar;
 import net.trim02.loginPassword.common.BypassList;
 import org.slf4j.Logger;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -49,10 +66,10 @@ public class PlayerConnection {
                 connectToServer.get().ping().get();
                 event.setInitialServer(connectToServer.get());
                 player.sendMessage(Component.text(configVar.welcomeMessage, NamedTextColor.GREEN));
-            } catch (InterruptedException | ExecutionException e) {
+            } catch (Exception e) {
                 event.setInitialServer(null);
-                logger.error("Error pinging login server: " + e.getMessage());
-                logger.error("Make sure the login server is online");
+                logger.error("Error pinging login server: {}, Exception type: {}", e.getMessage(), e.getClass().getName());
+                logger.error("Make sure the login server is online or exists");
 
 //                player.disconnect(Component.text("Failed to connect to server", NamedTextColor.RED));
 
