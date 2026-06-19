@@ -21,7 +21,6 @@
 package net.trim02.loginPassword;
 
 import com.destroystokyo.paper.event.player.PlayerConnectionCloseEvent;
-import com.technicjelle.UpdateChecker;
 import io.papermc.paper.command.brigadier.BasicCommand;
 import io.papermc.paper.event.connection.configuration.AsyncPlayerConnectionConfigureEvent;
 import io.papermc.paper.event.player.PlayerCustomClickEvent;
@@ -69,48 +68,12 @@ public class loginPasswordPaper extends JavaPlugin implements loginPassword<Serv
     @Override
     public void onEnable() {
 
-        UpdateChecker updateChecker = new UpdateChecker("trim02", "LoginPassword", BuildConstants.VERSION);
+
         if (loginPasswordPaper.isFolia()) {
             AsyncScheduler asyncScheduler = server.getAsyncScheduler();
-            asyncScheduler.runAtFixedRate(this, task -> {
-                try {
-                    updateChecker.check();
-                    if (updateChecker.isUpdateAvailable()) {
-
-                        var updateMessage = """
-                                A new version is available: %s -> %s. Download the new version here:
-                                modrinth: https://modrinth.com/plugin/loginpassword
-                                Hangar: https://hangar.papermc.io/trim02/loginPassword
-                                GitHub: %s
-                                """.formatted(updateChecker.getCurrentVersion(), updateChecker.getLatestVersion(),
-                                updateChecker.getUpdateUrl());
-
-                        logger.info(updateMessage);
-                    }
-                } catch (RuntimeException e) {
-                    throw new RuntimeException(e);
-                }
-            }, 1200, 12096000, TimeUnit.SECONDS);
+            asyncScheduler.runAtFixedRate(this, task -> updateCheck(), 1200, 12096000, TimeUnit.SECONDS);
         } else {
-            server.getScheduler().runTaskTimerAsynchronously(this, task -> {
-                try {
-                    updateChecker.check();
-                    if (updateChecker.isUpdateAvailable()) {
-
-                        var updateMessage = """
-                                A new version is available: %s -> %s. Download the new version here:
-                                modrinth: https://modrinth.com/plugin/loginpassword
-                                Hangar: https://hangar.papermc.io/trim02/loginPassword
-                                GitHub: %s
-                                """.formatted(updateChecker.getCurrentVersion(), updateChecker.getLatestVersion(),
-                                updateChecker.getUpdateUrl());
-
-                        logger.info(updateMessage);
-                    }
-                } catch (RuntimeException e) {
-                    throw new RuntimeException(e);
-                }
-            }, 1200, 12096000);
+            server.getScheduler().runTaskTimerAsynchronously(this, task -> updateCheck(), 1200, 12096000);
         }
 
         try {
