@@ -114,10 +114,10 @@ public class loginPasswordPaper extends JavaPlugin implements loginPassword<Serv
     public void reenableEvents() {
         try {
             debugMessage("Re-registering events...");
-            HandlerList apcceHL = AsyncPlayerConnectionConfigureEvent.getHandlerList();
+            AsyncPlayerConnectionConfigureEvent.getHandlerList().unregister(this);
             HandlerList pcceHL = PlayerCustomClickEvent.getHandlerList();
             HandlerList pconceHL = PlayerConnectionCloseEvent.getHandlerList();
-            apcceHL.unregister(this);
+//            apcceHL.unregister(this);
             pcceHL.unregister(this);
             pconceHL.unregister(this);
             this.getServer().getPluginManager().registerEvents(new DialogLogin(this, server, logger), this);
