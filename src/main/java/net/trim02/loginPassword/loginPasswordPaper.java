@@ -30,7 +30,6 @@ import net.trim02.loginPassword.interfaces.loginPassword;
 import net.trim02.loginPassword.paper.AdminCommand;
 import net.trim02.loginPassword.paper.DialogLogin;
 import org.bukkit.Server;
-import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -105,12 +104,9 @@ public class loginPasswordPaper extends JavaPlugin implements loginPassword<Serv
     public void reenableEvents() {
         try {
             debugMessage("Re-registering events...");
-            HandlerList apcceHL = AsyncPlayerConnectionConfigureEvent.getHandlerList();
-            HandlerList pcceHL = PlayerCustomClickEvent.getHandlerList();
-            HandlerList pconceHL = PlayerConnectionCloseEvent.getHandlerList();
-            apcceHL.unregister(this);
-            pcceHL.unregister(this);
-            pconceHL.unregister(this);
+            AsyncPlayerConnectionConfigureEvent.getHandlerList().unregister(this);
+            PlayerCustomClickEvent.getHandlerList().unregister(this);
+            PlayerConnectionCloseEvent.getHandlerList().unregister(this);
             this.getServer().getPluginManager().registerEvents(new DialogLogin(this, server, logger), this);
         } catch (Exception e) {
             logger.error("Failed to re-register events: ", e);
