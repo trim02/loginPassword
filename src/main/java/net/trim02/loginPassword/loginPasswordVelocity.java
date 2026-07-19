@@ -22,7 +22,6 @@ package net.trim02.loginPassword;
 
 
 import com.google.inject.Inject;
-import com.technicjelle.UpdateChecker;
 import com.velocitypowered.api.command.CommandManager;
 import com.velocitypowered.api.command.CommandMeta;
 import com.velocitypowered.api.command.SimpleCommand;
@@ -68,27 +67,8 @@ public class loginPasswordVelocity implements loginPassword<ProxyServer> {
 
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
-        
-        UpdateChecker updateChecker = new UpdateChecker("trim02", "loginPassword", BuildConstants.VERSION);
-        server.getScheduler().buildTask(this, () -> {
-            try {
-                updateChecker.check();
-                if (updateChecker.isUpdateAvailable()) {
 
-                    var updateMessage = """
-                            A new version is available: %s -> %s. Download the new version here:
-                            modrinth: https://modrinth.com/plugin/loginpassword
-                            Hangar: https://hangar.papermc.io/trim02/loginPassword
-                            GitHub: %s
-                            """.formatted(updateChecker.getCurrentVersion(), updateChecker.getLatestVersion(), updateChecker.getUpdateUrl());
-
-                    logger.info(updateMessage);
-                }
-            } catch (RuntimeException e) {
-                throw new RuntimeException(e);
-            }
-        }).repeat(7, TimeUnit.DAYS).schedule();
-
+        server.getScheduler().buildTask(this, this::updateCheck).repeat(7, TimeUnit.DAYS).schedule();
         
         try {
             logger.info("Initializing loginPassword plugin...");

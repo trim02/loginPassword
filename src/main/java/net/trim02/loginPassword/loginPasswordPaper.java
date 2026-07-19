@@ -21,21 +21,21 @@
 package net.trim02.loginPassword;
 
 import com.destroystokyo.paper.event.player.PlayerConnectionCloseEvent;
-import com.technicjelle.UpdateChecker;
 import io.papermc.paper.command.brigadier.BasicCommand;
 import io.papermc.paper.event.connection.configuration.AsyncPlayerConnectionConfigureEvent;
 import io.papermc.paper.event.player.PlayerCustomClickEvent;
+import io.papermc.paper.threadedregions.scheduler.AsyncScheduler;
 import net.trim02.loginPassword.common.BypassList;
 import net.trim02.loginPassword.interfaces.loginPassword;
 import net.trim02.loginPassword.paper.AdminCommand;
 import net.trim02.loginPassword.paper.DialogLogin;
 import org.bukkit.Server;
-import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 import java.nio.file.Path;
+import java.util.concurrent.TimeUnit;
 
 public class loginPasswordPaper extends JavaPlugin implements loginPassword<Server> {
 
@@ -53,39 +53,29 @@ public class loginPasswordPaper extends JavaPlugin implements loginPassword<Serv
         this.server = this.getInterServer();
         this.dataDirectory = this.getDataFolder().toPath();
         this.config = new Config(logger, dataDirectory);
+    }
 
-
+    private static boolean isFolia() {
+        try {
+            Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
     }
 
     @Override
     public void onEnable() {
 
-        UpdateChecker updateChecker = new UpdateChecker("trim02", "LoginPassword", BuildConstants.VERSION);
-        server.getScheduler().runTaskTimerAsynchronously(this, task -> {
-            try {
-                updateChecker.check();
-                if (updateChecker.isUpdateAvailable()) {
 
-                    var updateMessage = """
-                            A new version is available: %s -> %s. Download the new version here:
-                            modrinth: https://modrinth.com/plugin/loginpassword
-                            Hangar: https://hangar.papermc.io/trim02/loginPassword
-                            GitHub: %s
-                            """.formatted(updateChecker.getCurrentVersion(), updateChecker.getLatestVersion(), updateChecker.getUpdateUrl());
-
-                    logger.info(updateMessage);
-                }
-            } catch (RuntimeException e) {
-                throw new RuntimeException(e);
-            }
-        }, 1200, 12096000);
-
-
-
-
+        if (loginPasswordPaper.isFolia()) {
+            AsyncScheduler asyncScheduler = server.getAsyncScheduler();
+            asyncScheduler.runAtFixedRate(this, task -> updateCheck(), 1200, 12096000, TimeUnit.SECONDS);
+        } else {
+            server.getScheduler().runTaskTimerAsynchronously(this, task -> updateCheck(), 1200, 12096000);
+        }
 
         try {
-
             config.initConfig();
         } catch (Exception e) {
             logger.error("Failed to initialize config: ", e);
@@ -114,12 +104,9 @@ public class loginPasswordPaper extends JavaPlugin implements loginPassword<Serv
     public void reenableEvents() {
         try {
             debugMessage("Re-registering events...");
-            HandlerList apcceHL = AsyncPlayerConnectionConfigureEvent.getHandlerList();
-            HandlerList pcceHL = PlayerCustomClickEvent.getHandlerList();
-            HandlerList pconceHL = PlayerConnectionCloseEvent.getHandlerList();
-            apcceHL.unregister(this);
-            pcceHL.unregister(this);
-            pconceHL.unregister(this);
+            AsyncPlayerConnectionConfigureEvent.getHandlerList().unregister(this);
+            PlayerCustomClickEvent.getHandlerList().unregister(this);
+            PlayerConnectionCloseEvent.getHandlerList().unregister(this);
             this.getServer().getPluginManager().registerEvents(new DialogLogin(this, server, logger), this);
         } catch (Exception e) {
             logger.error("Failed to re-register events: ", e);
